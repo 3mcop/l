@@ -1,0 +1,18 @@
+#permissions th {
+	white-space: nowrap;
+}
+#permissions .pselect {
+  font-weight: normal !important;
+  text-align: center;
+  margin: 0;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+#permissions .pselect a, #permissions .pselect a:link, #permissions .pselect a:visited {
+	font-size: 9px;
+  text-decoration: underline; 
+  margin: 0;
+}
+#permissions .pselect a:hover {
+  text-decoration: none; 
+}

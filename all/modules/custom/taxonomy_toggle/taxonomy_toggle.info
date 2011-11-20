@@ -1,0 +1,6 @@
+name = "Taxonomy toggle"
+description = "Provides a block to toggle a taxonomy term in a taxonomy filtered view."
+dependencies[] = taxonomy
+package = Taxonomy
+core = 7.x
+

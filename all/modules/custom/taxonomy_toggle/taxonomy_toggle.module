@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Provides block to toggle a txonomy term.
+ */
+
+/**
+ * Implements hook_block_info()
+ */
+function taxonomy_toggle_block_info() {
+
+  $blocks['toggle'] = array(
+    'info' => 'Toggle taxonomy',
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view()
+ */
+function taxonomy_toggle_block_view( $delta = '' ) {
+
+  switch ( $delta ) {
+  case 'toggle' :
+    $block['subject'] = '';
+    $block['content'] = _taxonomy_toggle_content();
+    return $block;
+  }
+}
+
+function _taxonomy_toggle_content() {
+
+  // Is the current path not a taxonomy view?
+  // @todo - make path configurable
+  // @todo - allow multiple paths
+  if ( ! ( arg(0) == 'taxonomy' && arg(1) == 'term' ) ) {
+    return '';
+  }
+
+  // Get raw taxonomy term IDs
+  // @todo - make term IDs argument configurable
+  $term_ids_arg_index = 2;
+  $arg_term_ids_string = arg( $term_ids_arg_index );
+
+  //// Determine whether taxonomy terms ANDed or ORed.
+  //$is_and = ( strpos( arg(2), ',' ) !== FALSE );
+  //$is_or = ( preg_match( '#[ +]#', arg(2) ) > 0 );
+
+  //// Is the set of term IDs invalid?
+  //if ( $is_and && $is_or ) {
+  //  return '';
+  //}
+
+  // Get individual term IDs
+  $arg_term_ids = preg_split( '#[, +]#', $arg_term_ids_string );
+
+  // @todo - make choice of vocabulary-to-toggle configurable
+  $toggle_vid = 2;
+
+  // @todo - make depth of vocabulary tree configurable
+  $toggle_terms = taxonomy_get_tree( $toggle_vid, 0, 1 );
+
+
+  $links = array();
+
+  // 'None' toggle link
+  $links[] = array(
+    'title' => t( 'None' ),
+    'href' => _taxonomy_toggle_get_link_path(
+      $toggle_terms, $arg_term_ids, $term_ids_arg_index, NULL ),
+  );
+
+  // Term toggle links
+  foreach ( $toggle_terms as $term ) {
+    $links[] = array(
+      'title' => t( $term->name ),
+      'href' => _taxonomy_toggle_get_link_path(
+        $toggle_terms, $arg_term_ids, $term_ids_arg_index, $term->tid ),
+    );
+  }
+
+  $result = '<div class="taxonomy-toggle-list">';
+  $result .= theme( 'links', $links );
+  $result .= '</div>';
+
+  return $result;
+}
+
+function _taxonomy_toggle_get_link_path( $toggle_terms, $arg_term_ids, $arg_index, $term_id ) {
+
+  dsm( func_get_args() ); 
+}

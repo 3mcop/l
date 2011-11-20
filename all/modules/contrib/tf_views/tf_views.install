@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Install, uninstall, and update functions for the (Taxonomy Filter) Multi-Term Views module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function tf_views_install() {
+  // Add index on {taxonomy_index} to speed up multi-term join queries executed
+  // by this module and views.
+  db_add_index('taxonomy_index', 'node_term', array('nid', 'tid'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function tf_views_uninstall() {
+  // Drop index on {taxonomy_index}.
+  db_drop_index('taxonomy_index', 'node_term');
+}
+
+/**
+ * Implements hook_schema_alter().
+ */
+function tf_views_schema_alter() {
+  // Add index to dramatically speed up multi-term join queries.
+  $schema['taxonomy_index']['indexes']['node_term'] = array('nid', 'tid');
+}

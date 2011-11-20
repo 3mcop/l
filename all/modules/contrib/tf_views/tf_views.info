@@ -1,0 +1,15 @@
+name = "Multi-Term Views"
+description = "Provides a multi-term node display (restoring functionality removed in Drupal 7)."
+;dependencies[] = taxonomy_filter
+dependencies[] = views
+package = Taxonomy Filter
+core = 7.x
+
+;files[] = tf_views.module
+
+; Information added by drupal.org packaging script on 2011-10-20
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "tf_views"
+datestamp = "1319113568"
+

@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Views items for the (Taxonomy Filter) Multi-Term Views module.
+ */
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function tf_views_views_query_alter(&$view, &$query) {
+  if ($view->name == 'taxonomy_term') {
+    if (!isset($view->args[0]) || !is_string($view->args[0])) {
+      return;
+    }
+    if (strpos($view->args[0], ' ') !== FALSE) {
+      // Retain default view functionality of OR-ing the tids. (Views removes the '+')
+      return;
+    }
+
+    foreach ($query->where[0]['conditions'] as $key => $condition) {
+      if ($condition['field'] = 'node.nid' && $condition['value'] instanceof SelectQuery) {
+        // Hopefully this identifies the condition to be changed.
+        $select = $query->where[0]['conditions'][$key]['value'];
+        // Extract the submitted term id values;
+        $tids = explode(',', $view->args[0]);
+        foreach ($tids as $index => $tid) {
+          // Add a join producing an AND of the terms.
+          $alias = 'tn' . $index;
+          $select->join('taxonomy_index', $alias, 'tn.nid = ' . $alias . '.nid AND ' . $alias . '.tid = ' . $tid);
+        }
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function __tf_views_query_views_alter__(QueryAlterableInterface $query) {
+return;
+  // Altering the query object in this hook seems much more difficult than doing
+  // so in the hook above. And would require modification of both the count and
+  // the data queries.
+  if ($query->alterMetaData['view']->name == 'taxonomy_term') {
+    // @todo Alter both the count query and the data query.
+    foreach ($query as $property => $value) {
+    }
+  }
+}

@@ -6,6 +6,7 @@ Taxonomy toggle
    - path is parsed for vocabulary names and a block is configured for appropriate paths, e.g.
      /arg1/arg2/*/arg3/*
 
+
  - block
    - block is shown with a set of links, each of which changes exactly one term in the path e.g.
 
@@ -27,8 +28,9 @@ Taxonomy toggle
        title vocab2-term3 (current link)
          href /arg1/arg2/vocab1-term1/arg3/vocab2-term3
 
+
  - extra features
    - in config, use (vocab1,vocab2) in path where terms from more than one vocab could be used.
    - in config, use () in path to indicate that terms from any taxonomy can be used
    - in block, add entity count to each link title
-
+   - debug-mode - one block appears on every page and works out whether any part of the URL is a taxonomy term. Loads vocabularies specific to any terms found - configured paths are ignored in this mode

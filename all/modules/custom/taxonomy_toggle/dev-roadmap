@@ -1,0 +1,34 @@
+Taxonomy toggle
+
+ - config
+   - specify paths with vocabularies in, e.g.
+     /arg1/arg2/vocab1/arg3/vocab2
+   - path is parsed for vocabulary names and a block is configured for appropriate paths, e.g.
+     /arg1/arg2/*/arg3/*
+
+ - block
+   - block is shown with a set of links, each of which changes exactly one term in the path e.g.
+
+     if the current path were
+
+       /arg1/arg2/vocab1-term1/arg3/vocab2-term3
+
+     then the links shown would be:
+
+       title vocab1-term1 (current link)
+         href /arg1/arg2/vocab1-term1/arg3/vocab2-term3
+       title vocab1-term2
+         href /arg1/arg2/vocab1-term2/arg3/vocab2-term3
+
+       title vocab2-term1
+         href /arg1/arg2/vocab1-term1/arg3/vocab2-term1
+       title vocab2-term2
+         href /arg1/arg2/vocab1-term1/arg3/vocab2-term2
+       title vocab2-term3 (current link)
+         href /arg1/arg2/vocab1-term1/arg3/vocab2-term3
+
+ - extra features
+   - in config, use (vocab1,vocab2) in path where terms from more than one vocab could be used.
+   - in config, use () in path to indicate that terms from any taxonomy can be used
+   - in block, add entity count to each link title
+

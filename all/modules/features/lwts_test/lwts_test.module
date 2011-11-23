@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the LWTS test feature.
+ */
+
+include_once('lwts_test.features.inc');

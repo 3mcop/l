@@ -57,6 +57,8 @@ function articles_views_default_views() {
   $handler->display->display_options['arguments']['tid']['table'] = 'taxonomy_index';
   $handler->display->display_options['arguments']['tid']['field'] = 'tid';
   $handler->display->display_options['arguments']['tid']['ui_name'] = 'Taxonomy - Knowledge type';
+  $handler->display->display_options['arguments']['tid']['title_enable'] = 1;
+  $handler->display->display_options['arguments']['tid']['title'] = '%1';
   $handler->display->display_options['arguments']['tid']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['tid']['default_argument_options']['argument'] = '0';
   $handler->display->display_options['arguments']['tid']['default_argument_skip_url'] = 0;
@@ -69,7 +71,7 @@ function articles_views_default_views() {
     'knowledge_type' => 'knowledge_type',
   );
   $handler->display->display_options['arguments']['tid']['validate_options']['type'] = 'convert';
-  $handler->display->display_options['arguments']['tid']['validate_options']['transform'] = 0;
+  $handler->display->display_options['arguments']['tid']['validate_options']['transform'] = '1';
   $handler->display->display_options['arguments']['tid']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['tid']['add_table'] = 0;
   $handler->display->display_options['arguments']['tid']['require_value'] = 0;
@@ -80,6 +82,8 @@ function articles_views_default_views() {
   $handler->display->display_options['arguments']['term_node_tid_depth']['table'] = 'node';
   $handler->display->display_options['arguments']['term_node_tid_depth']['field'] = 'term_node_tid_depth';
   $handler->display->display_options['arguments']['term_node_tid_depth']['ui_name'] = 'Taxonomy - Topic (with depth)';
+  $handler->display->display_options['arguments']['term_node_tid_depth']['title_enable'] = 1;
+  $handler->display->display_options['arguments']['term_node_tid_depth']['title'] = '%1, %2';
   $handler->display->display_options['arguments']['term_node_tid_depth']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['term_node_tid_depth']['default_argument_skip_url'] = 0;
   $handler->display->display_options['arguments']['term_node_tid_depth']['summary']['number_of_records'] = '0';
@@ -91,7 +95,7 @@ function articles_views_default_views() {
     'topic' => 'topic',
   );
   $handler->display->display_options['arguments']['term_node_tid_depth']['validate_options']['type'] = 'convert';
-  $handler->display->display_options['arguments']['term_node_tid_depth']['validate_options']['transform'] = 0;
+  $handler->display->display_options['arguments']['term_node_tid_depth']['validate_options']['transform'] = '1';
   $handler->display->display_options['arguments']['term_node_tid_depth']['depth'] = '10';
   $handler->display->display_options['arguments']['term_node_tid_depth']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['term_node_tid_depth']['set_breadcrumb'] = 0;
@@ -101,6 +105,8 @@ function articles_views_default_views() {
   $handler->display->display_options['arguments']['tid_1']['table'] = 'taxonomy_index';
   $handler->display->display_options['arguments']['tid_1']['field'] = 'tid';
   $handler->display->display_options['arguments']['tid_1']['ui_name'] = 'Taxonomy - Location';
+  $handler->display->display_options['arguments']['tid_1']['title_enable'] = 1;
+  $handler->display->display_options['arguments']['tid_1']['title'] = '%1, %2, %3';
   $handler->display->display_options['arguments']['tid_1']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['tid_1']['default_argument_skip_url'] = 0;
   $handler->display->display_options['arguments']['tid_1']['summary']['number_of_records'] = '0';
@@ -112,7 +118,7 @@ function articles_views_default_views() {
     'location' => 'location',
   );
   $handler->display->display_options['arguments']['tid_1']['validate_options']['type'] = 'convert';
-  $handler->display->display_options['arguments']['tid_1']['validate_options']['transform'] = 0;
+  $handler->display->display_options['arguments']['tid_1']['validate_options']['transform'] = '1';
   $handler->display->display_options['arguments']['tid_1']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['tid_1']['add_table'] = 0;
   $handler->display->display_options['arguments']['tid_1']['require_value'] = 0;

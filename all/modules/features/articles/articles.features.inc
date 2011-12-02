@@ -29,10 +29,10 @@ function articles_views_api() {
  */
 function articles_node_info() {
   $items = array(
-    'lwts_article' => array(
-      'name' => t('Lwts article'),
+    'lwts_video' => array(
+      'name' => t('Video'),
       'base' => 'node_content',
-      'description' => t('The primary content type for Live With the Sea. May contain different kinds of media'),
+      'description' => t('An article containing a video. The body of the article may contain other HTML elements, e.g. images.'),
       'has_title' => '1',
       'title_label' => t('Title'),
       'help' => '',

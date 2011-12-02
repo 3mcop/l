@@ -10,8 +10,8 @@
 function articles_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-lwts_article-body'
-  $fields['node-lwts_article-body'] = array(
+  // Exported field: 'node-lwts_video-body'
+  $fields['node-lwts_video-body'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -39,7 +39,7 @@ function articles_field_default_fields() {
       'type' => 'text_with_summary',
     ),
     'field_instance' => array(
-      'bundle' => 'lwts_article',
+      'bundle' => 'lwts_video',
       'default_value' => NULL,
       'deleted' => '0',
       'description' => '',
@@ -82,8 +82,8 @@ function articles_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-lwts_article-field_knowledge_type'
-  $fields['node-lwts_article-field_knowledge_type'] = array(
+  // Exported field: 'node-lwts_video-field_knowledge_type'
+  $fields['node-lwts_video-field_knowledge_type'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -116,7 +116,7 @@ function articles_field_default_fields() {
       'type' => 'taxonomy_term_reference',
     ),
     'field_instance' => array(
-      'bundle' => 'lwts_article',
+      'bundle' => 'lwts_video',
       'default_value' => NULL,
       'deleted' => '0',
       'description' => 'Is this an Action or Education item? This will be used to differentiate articles on the same subject according to whether they relate to theory or practice.',
@@ -152,8 +152,8 @@ function articles_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-lwts_article-field_origin'
-  $fields['node-lwts_article-field_origin'] = array(
+  // Exported field: 'node-lwts_video-field_origin'
+  $fields['node-lwts_video-field_origin'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -186,7 +186,7 @@ function articles_field_default_fields() {
       'type' => 'taxonomy_term_reference',
     ),
     'field_instance' => array(
-      'bundle' => 'lwts_article',
+      'bundle' => 'lwts_video',
       'default_value' => NULL,
       'deleted' => '0',
       'description' => 'What part of the world does this content come from. This will be used to allow users to search for content from a specfic region.',
@@ -222,8 +222,8 @@ function articles_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-lwts_article-field_other_topics'
-  $fields['node-lwts_article-field_other_topics'] = array(
+  // Exported field: 'node-lwts_video-field_other_topics'
+  $fields['node-lwts_video-field_other_topics'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '-1',
@@ -256,7 +256,7 @@ function articles_field_default_fields() {
       'type' => 'taxonomy_term_reference',
     ),
     'field_instance' => array(
-      'bundle' => 'lwts_article',
+      'bundle' => 'lwts_video',
       'default_value' => NULL,
       'deleted' => '0',
       'description' => 'What subject areas (other than the primary topic) are covered by this article? These will be used to identify the article when users search for a given topic.',
@@ -292,8 +292,8 @@ function articles_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-lwts_article-field_primary_topic'
-  $fields['node-lwts_article-field_primary_topic'] = array(
+  // Exported field: 'node-lwts_video-field_primary_topic'
+  $fields['node-lwts_video-field_primary_topic'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
@@ -326,7 +326,7 @@ function articles_field_default_fields() {
       'type' => 'taxonomy_term_reference',
     ),
     'field_instance' => array(
-      'bundle' => 'lwts_article',
+      'bundle' => 'lwts_video',
       'default_value' => NULL,
       'deleted' => '0',
       'description' => 'What is the main subject of the article. This will be used to promote content on the home page and other areas of the site.',
@@ -362,6 +362,90 @@ function articles_field_default_fields() {
     ),
   );
 
+  // Exported field: 'node-lwts_video-field_video'
+  $fields['node-lwts_video-field_video'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_video',
+      'foreign keys' => array(
+        'fid' => array(
+          'columns' => array(
+            'fid' => 'fid',
+          ),
+          'table' => 'file_managed',
+        ),
+      ),
+      'indexes' => array(
+        'fid' => array(
+          0 => 'fid',
+        ),
+      ),
+      'module' => 'video',
+      'settings' => array(
+        'autoconversion' => 0,
+        'autothumbnail' => 'auto',
+        'default_video_thumbnail' => array(
+          'fid' => '24',
+          'filemime' => 'image/jpeg',
+          'filename' => 'fluffy.jpeg',
+          'filesize' => 3912,
+          'rdf_mapping' => array(),
+          'status' => 1,
+          'timestamp' => 1322825662,
+          'uid' => '1',
+          'uri' => 'public://videos/thumbnails/default/fluffy.jpeg',
+        ),
+        'preview_video_thumb_style' => 'thumbnail',
+        'uri_scheme' => 'public',
+      ),
+      'translatable' => '0',
+      'type' => 'video',
+    ),
+    'field_instance' => array(
+      'bundle' => 'lwts_video',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'videojs',
+          'settings' => array(),
+          'type' => 'videojs',
+          'weight' => '10',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_video',
+      'label' => 'Video',
+      'required' => 0,
+      'settings' => array(
+        'default_dimensions' => '640x360',
+        'file_directory' => 'videos/original',
+        'file_extensions' => 'mp4 ogg avi mov wmv flv ogv webm',
+        'max_filesize' => '',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'video',
+        'settings' => array(
+          'progress_indicator' => 'throbber',
+        ),
+        'type' => 'video_upload',
+        'weight' => '10',
+      ),
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
@@ -370,6 +454,7 @@ function articles_field_default_fields() {
   t('Origin');
   t('Other topics');
   t('Primary topic');
+  t('Video');
   t('What is the main subject of the article. This will be used to promote content on the home page and other areas of the site.');
   t('What part of the world does this content come from. This will be used to allow users to search for content from a specfic region.');
   t('What subject areas (other than the primary topic) are covered by this article? These will be used to identify the article when users search for a given topic.');

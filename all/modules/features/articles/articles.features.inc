@@ -29,6 +29,14 @@ function articles_views_api() {
  */
 function articles_node_info() {
   $items = array(
+    'lwts_article' => array(
+      'name' => t('Lwts article'),
+      'base' => 'node_content',
+      'description' => t('The primary content type for Live With the Sea. May contain different kinds of media'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'lwts_video' => array(
       'name' => t('Video'),
       'base' => 'node_content',

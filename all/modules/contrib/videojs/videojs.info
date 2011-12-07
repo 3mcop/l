@@ -6,9 +6,3 @@ dependencies[] = file
 files[] = videojs.module
 files[] = videojs.theme.inc
 files[] = includes/videojs_style_plugin.inc
-; Information added by drupal.org packaging script on 2011-10-03
-version = "7.x-1.10"
-core = "7.x"
-project = "videojs"
-datestamp = "1317631009"
-

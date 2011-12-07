@@ -68,21 +68,25 @@ function template_preprocess_videojs(&$vars) {
 //    $vars['items'][$delta]['label'] = $item['description'] ? $item['description'] : $item['filename'];
   }
   $vars['items'] = array_merge($items_mp4, $items_others); // mp4 listed first
-  // Special treatment for 'video/flv', if one is exist use it as flash fallback, otherwise first mp4
-  foreach ($vars['items'] as $item) {
-    if ($item['filemime'] == 'video/flv') {
-      $vars['flash'] = file_create_url($item['uri']);
-      break;
+if (!empty($vars['items'])) {
+    // Special treatment for 'video/flv', if one is exist use it as flash fallback, otherwise first mp4
+    foreach ($vars['items'] as $item) {
+      if ($item['filemime'] == 'video/flv') {
+        $vars['flash'] = file_create_url($item['uri']);
+        break;
+      }
     }
+    if (!isset($vars['flash']) && !empty($items_mp4)) {
+      $vars['flash'] = file_create_url($items_mp4[0]['uri']);
+    }
+    else {
+    	$vars['flash'] = NULL;
+    }
+    $flash_player = _videojs_flashplayer($vars['flash'], $vars['width'], $vars['height'], $vars['poster']);
+    $vars['flash_player'] = NULL;
+    if (isset($flash_player))
+      $vars['flash_player'] = $flash_player;
   }
-  if (!isset($vars['flash'])) {
-    $vars['flash'] = file_create_url($items_mp4[0]['uri']);
-  }
-
-  $flash_player = _videojs_flashplayer($vars['flash'], $vars['width'], $vars['height'], $vars['poster']);
-  $vars['flash_player'] = NULL;
-  if (isset($flash_player))
-    $vars['flash_player'] = $flash_player;
 }
 
 /**

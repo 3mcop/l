@@ -4,3 +4,5 @@ default/files
 *.swp
 *.tar
 *.zip
+*.gz
+*.bz2

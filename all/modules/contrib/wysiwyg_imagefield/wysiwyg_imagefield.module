@@ -1,0 +1,136 @@
+<?php
+/**
+ * @file
+ * An ImageField based IMCE alternative.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function wysiwyg_imagefield_init() {
+  foreach (module_list() as $module) {
+    if (file_exists($file = dirname(__FILE__) . "/modules/{$module}.inc")) {
+      require_once $file;
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function wysiwyg_imagefield_theme_registry_alter(&$theme_registry) {
+  drupal_alter('wysiwyg_imagefield_theme_registry', $theme_registry);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function wysiwyg_imagefield_form_alter(&$form, &$form_state, $form_id) {
+  // Add Wysiwyg ImageField settings to ImageField content field forms.
+  if ($form_id == 'field_ui_field_edit_form' && $form['#field']['module'] == 'image') {
+    $form['instance']['wysiwyg_imagefield'] = array(
+      '#title' => t('Use with Wysiwyg ImageField?'),
+      '#type' => 'checkbox',
+      '#default_value' => variable_get("wysiwyg_imagefield_{$form['instance']['bundle']['#value']}", NULL) == $form['#field']['field_name'],
+      '#description' =>
+        t('If checked, this ImageField will be used for the Wysiwyg ImageField module.') . '<br />' .
+        '<strong>' . t('Note') . ':</strong> ' . t('Only one ImageField can be used with Wysiwyg ImageField at any one time.')
+      ,
+    );
+    $form['#submit'][] = 'wysiwyg_imagefield_form_submit';
+    $form['#validate'][] = 'wysiwyg_imagefield_form_validate';
+  }
+
+  // Attach jQuery UI Dialog to node forms.
+  if (isset($form['type']['#value']) && $form_id == "{$form['type']['#value']}_node_form" && !is_null(variable_get("wysiwyg_imagefield_{$form['#node']->type}", NULL))) {
+    $_SESSION['wysiwyg_imagefield'] = TRUE;
+    $form['#after_build'][] = 'wysiwyg_imagefield_after_build';
+  }
+}
+
+/**
+ * Submit handler for Wysiwyg ImageField settings on ImageField content field forms.
+ */
+function wysiwyg_imagefield_form_submit(&$form, &$form_state) {
+  if ($form_state['values']['instance']['wysiwyg_imagefield']) {
+    variable_set("wysiwyg_imagefield_{$form_state['values']['instance']['bundle']}", $form_state['values']['instance']['field_name']);
+  }
+
+  elseif (variable_get("wysiwyg_imagefield_{$form_state['values']['instance']['bundle']}", NULL)) {
+    variable_del("wysiwyg_imagefield_{$form_state['values']['instance']['bundle']}");
+  }
+}
+
+/**
+ * Validation for Wysiwyg ImageField settings on ImageField content field forms.
+ */
+function wysiwyg_imagefield_form_validate(&$form, &$form_state) {
+  // Insert is required on a Wysiwyg ImageField field.
+    dsm( $form_state['values']['instance']['widget']['settings']);
+  if ($form_state['values']['instance']['wysiwyg_imagefield'] && !$form_state['values']['instance']['widget']['settings']['insert']) {
+    //form_set_error('wysiwyg_imagefield', t('Insert is required to use this field with Wysiwyg ImageField.'));
+  }
+
+  // Image number of values must be set to 'Unlimited'.
+  if ($form_state['values']['instance']['wysiwyg_imagefield'] && $form_state['values']['field']['cardinality'] != -1) {
+    form_set_error('wysiwyg_imagefield', t("'Number of values' must be set 'Unlimited' to use this field with Wysiwyg ImageField."));
+  }
+}
+
+/**
+ *
+ */
+function wysiwyg_imagefield_after_build($form_element, &$form_state) {
+  $imagefield = variable_get("wysiwyg_imagefield_{$form_element['#bundle']}", NULL);
+  if (!is_null($imagefield) && ($index = _wysiwyg_imagefield_array_search_recursive($form_element, $imagefield)) !== FALSE) {
+    $element = &$form_element;
+
+    // Select non-root level $element.
+    if (!empty($index)) {
+      $index = explode('][', $index);
+      while ($index) {
+        $element = &$element[array_shift($index)];
+      }
+    }
+
+    // Modify file handler element.
+    $element[$imagefield][LANGUAGE_NONE]['#prefix'] = "<div id='wysiwyg_imagefield-wrapper'>{$element[$imagefield][LANGUAGE_NONE]['#prefix']}";
+    $element[$imagefield][LANGUAGE_NONE]['#suffix'] = "{$element[$imagefield][LANGUAGE_NONE]['#suffix']}</div>";
+
+    // Add Javascript.
+    drupal_add_library('system', 'ui.dialog');
+    drupal_add_js(
+      array(
+        'WysiwygImageField' => array(
+          'field' => $imagefield,
+          'title' => $element[$imagefield][LANGUAGE_NONE]['#title']
+        )
+      ),
+      array(
+        'type' => 'setting',
+        'scope' => JS_DEFAULT,
+      )
+    );
+  }
+
+  return $form_element;
+}
+
+/**
+ *
+ */
+function _wysiwyg_imagefield_array_search_recursive(&$haystack, $needle, $index = NULL) {
+  if (isset($haystack[$needle])) {
+    return isset($index) ? $index : '';
+  }
+
+  else {
+    foreach (element_children($haystack) as $child) {
+      if (($result = _wysiwyg_imagefield_array_search_recursive($haystack[$child], $needle, $child)) !== FALSE) {
+        return isset($index) ? "{$index}][{$result}" : $result;
+      }
+    }
+  }
+
+  return FALSE;
+}

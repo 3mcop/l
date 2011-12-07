@@ -1,0 +1,19 @@
+core = 7.x
+dependencies[] = "image"
+dependencies[] = "insert"
+dependencies[] = "wysiwyg"
+description = "An ImageField based IMCE alternative"
+name = "Wysiwyg ImageField"
+project = "wysiwyg_imagefield"
+files[] = wysiwyg_imagefield.module
+files[] = modules/filefield_sources.inc
+files[] = modules/help.inc
+files[] = modules/views.inc
+files[] = plugins/wysiwyg_imagefield.inc
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "wysiwyg_imagefield"
+datestamp = "1298620755"
+

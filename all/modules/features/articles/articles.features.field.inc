@@ -82,6 +82,88 @@ function articles_field_default_fields() {
     ),
   );
 
+  // Exported field: 'node-lwts_article-field_inline_image'
+  $fields['node-lwts_article-field_inline_image'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '-1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_inline_image',
+      'foreign keys' => array(
+        'fid' => array(
+          'columns' => array(
+            'fid' => 'fid',
+          ),
+          'table' => 'file_managed',
+        ),
+      ),
+      'indexes' => array(
+        'fid' => array(
+          0 => 'fid',
+        ),
+      ),
+      'module' => 'image',
+      'settings' => array(
+        'default_image' => 0,
+        'uri_scheme' => 'public',
+      ),
+      'translatable' => '0',
+      'type' => 'image',
+    ),
+    'field_instance' => array(
+      'bundle' => 'lwts_article',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '6',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_inline_image',
+      'label' => 'Inline images',
+      'required' => 0,
+      'settings' => array(
+        'alt_field' => 0,
+        'file_directory' => '',
+        'file_extensions' => 'png gif jpg jpeg',
+        'max_filesize' => '',
+        'max_resolution' => '',
+        'min_resolution' => '',
+        'title_field' => 0,
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'image',
+        'settings' => array(
+          'insert' => 1,
+          'insert_class' => '',
+          'insert_default' => 'image',
+          'insert_styles' => array(
+            '<all>' => '<all>',
+          ),
+          'insert_width' => '600',
+          'preview_image_style' => 'thumbnail',
+          'progress_indicator' => 'throbber',
+        ),
+        'type' => 'image_image',
+        'weight' => '31',
+      ),
+      'wysiwyg_imagefield' => 1,
+    ),
+  );
+
   // Exported field: 'node-lwts_article-field_knowledge_type'
   $fields['node-lwts_article-field_knowledge_type'] = array(
     'field_config' => array(
@@ -801,6 +883,7 @@ function articles_field_default_fields() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
+  t('Inline images');
   t('Is this an Action or Education item? This will be used to differentiate articles on the same subject according to whether they relate to theory or practice.');
   t('Knowledge type');
   t('Origin');

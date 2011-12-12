@@ -102,6 +102,27 @@ function articles_strongarm() {
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_lwts_article_pattern';
+  $strongarm->value = 'article/[node:title]';
+  $export['pathauto_node_lwts_article_pattern'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_lwts_video_pattern';
+  $strongarm->value = 'article/[node:title]';
+  $export['pathauto_node_lwts_video_pattern'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_pattern';
+  $strongarm->value = '[node:title]';
+  $export['pathauto_node_pattern'] = $strongarm;
+
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'wysiwyg_imagefield_lwts_article';
   $strongarm->value = 'field_inline_image';
   $export['wysiwyg_imagefield_lwts_article'] = $strongarm;

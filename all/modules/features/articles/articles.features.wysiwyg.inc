@@ -54,8 +54,6 @@ function articles_wysiwyg_default_profiles() {
           'imce' => 1,
         ),
         'drupal' => array(
-          'media' => 1,
-          'video' => 1,
           'wysiwyg_imagefield' => 1,
           'break' => 1,
         ),

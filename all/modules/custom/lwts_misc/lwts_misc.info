@@ -1,0 +1,6 @@
+name = "LWtS miscellaneous"
+description = "Small pieces of functionality specific to LWtS that may be moved out to individual modules as they grow or become genericised."
+dependencies[] = taxonomy
+package = Live With the Sea
+core = 7.x
+

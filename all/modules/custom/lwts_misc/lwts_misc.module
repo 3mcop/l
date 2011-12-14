@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * LWtS specific code.
+ */
+
+/**
+ * Implements hook_menu()
+ */
+function lwts_misc_menu() {
+
+  // Link to rebuild topic menus
+  $items['admin/config/lwts/rebuild-topics-menu'] = array(
+    'title' => 'Rebuild topics menu',
+    'description' => 'Rebuild the Topics menu from the Topic vocabulary.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array( 'lwts_misc_rebuild_topics_menu_form' ), 
+    'access arguments' => array( 'Administer vocabularies and terms' ),
+  );
+    
+  return $items;
+}
+
+/**
+ * Form callback to rebuild Topics menu from Topic taxonomy.
+ */
+function lwts_misc_rebuild_topics_menu_form() {
+
+  $form = array();
+
+  $form['warning'] = array(
+    '#type' => 'item',
+    '#title' => 'Warning',
+    '#prefix' => '<div class="messages warning">',
+    '#markup' => 'Rebuilding the menu will discard any changes that you have made to the menu yourself.',
+    '#suffix' => '</div>',
+  );
+
+  $form['vocab'] = array(
+    '#type' => 'item',
+    '#title' => 'Vocabulary (source)',
+    '#markup' => 'Topic',
+    '#description' => 'The vocabulary whose top level terms will be used as the items in the selected menu.',
+  );
+
+  $form['menu'] = array(
+    '#type' => 'item',
+    '#title' => 'Menu (destination)',
+    '#markup' => 'Topics',
+    '#description' => 'The menu whose items will be replaced with the top level terms from the selected vocabulary.',
+  );
+
+  $form['do-it'] = array(
+    '#type' => 'submit',
+    '#value' => 'Rebuild',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit fn for form callback to rebuild Topics menu from Topic taxonomy.
+ */
+function lwts_misc_rebuild_topics_menu_form_submit() {
+
+  // Data that would be set in the form if this was configurable
+  $source_vid = 3;
+  $dest_menu_name = 'menu-topics';
+
+  // Make sure topics appear in the order that we want them to.
+  $weight = -10;
+
+  // Delete all links in the destination menu.
+  menu_delete_links( $dest_menu_name );
+
+  // Save a link to the home page 
+  $home_menu_item = array(
+    'link_path' => '<front>',
+    'link_title' => t('Home'),
+    'menu_name' => $dest_menu_name,
+    'weight' => $weight++,
+  );
+  $success = menu_link_save( $home_menu_item );
+
+  // Did saving the link succeed?
+  if ( ! $success ) {
+    drupal_set_message(
+      t('Rebuilding @menu_name menu failed.', array ( '@menu_name' => $home_menu_item ) ),
+      'error'
+    );
+    return;
+  }
+
+  // Get the top level terms from the source vocabulary.
+  $top_level_terms = taxonomy_get_tree( $source_vid, 0, 1 );
+
+  // Iterate through top level terms
+  foreach ( $top_level_terms as $term ) {
+
+    // 'Spiny forest' -> 'spiny-forest'
+    $path_name = strtolower( str_replace( ' ', '-', $term->name ) );
+
+    // Create a menu item for the current term.
+    $menu_item = array(
+      'link_path' => 'articles/' . $path_name,
+      'link_title' => $term->name,
+      'menu_name' => $dest_menu_name,
+      'weight' => $weight++,
+      //options: (optional) An array of options, see l() for more.
+    );
+    $success = menu_link_save( $menu_item );
+
+    // Did saving the link succeed?
+    if ( ! $success ) {
+      drupal_set_message(
+        t('Rebuilding @menu_name menu failed.', array ( '@menu_name' => $home_menu_item ) ),
+        'error'
+      );
+      return;
+    }
+  }
+}
+
+

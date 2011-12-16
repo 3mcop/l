@@ -6,6 +6,8 @@
  * the Panels module.
  */
 
+// GENERICISE LATER!!!! Don't be trapped in to making very generic fns first
+
 /**
  * Implements hook_menu()
  */
@@ -31,14 +33,24 @@ function lwts_custom_pages_home_page() {
   // No need for a primary topic field when done this way!!!!!
 
   // Admin vars:
-  //   sort order             e.g. date / rating
-  //   sticky applies?        i.e. yes / no
-  //   primary vocab          e.g. Knowledge type
-  //   secondary vocab        e.g. Primary topic
-  //   max columns            e.g. 3
+  $sort_property = 'changed';
+  $sort_order = 'DESC';
+  $is_sticky_applies = TRUE;
+  $prime_vocab = 'Knowledge type';
+  $second_vocab = 'Topic';
+  $max_columns = 3;
 
   // Get all nodes of types (article, video), ordered by <sort order> and
   // grouped by stickiness if <sticky applies>.
+  $nodes = _lwts_custom_pages_get_nodes(
+    $sort_property,
+    $sort_order,
+    $is_sticky_applies,
+    $prime_vocab,
+    $second_vocab,
+    $max_columns
+  );
+
   //
   // For each term in the <primary vocab>
   //   remove the first node that is tagged with that term.

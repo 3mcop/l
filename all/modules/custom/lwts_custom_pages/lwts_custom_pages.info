@@ -1,0 +1,5 @@
+name = "LWtS custom pages"
+description = "Pages specific to LWtS that were prohibitively difficult to do using the Panels module."
+package = Live With the Sea
+core = 7.x
+

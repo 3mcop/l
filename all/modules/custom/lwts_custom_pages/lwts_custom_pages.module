@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Pages specific to LWtS that were prohibitively difficult to do using
+ * the Panels module.
+ */
+
+/**
+ * Implements hook_menu()
+ */
+function lwts_custom_pages_menu() {
+
+  $items = array();
+
+  // Home page
+  $items['home-page'] = array (
+    'title' => 'Home',
+    'description' => 'See the latest from Live with the Sea',
+    'page callback' => 'lwts_custom_pages_home_page',
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback for the home page.
+ */
+function lwts_custom_pages_home_page() {
+
+  // No need for a primary topic field when done this way!!!!!
+
+  // Admin vars:
+  //   sort order             e.g. date / rating
+  //   sticky applies?        i.e. yes / no
+  //   primary vocab          e.g. Knowledge type
+  //   secondary vocab        e.g. Primary topic
+  //   max columns            e.g. 3
+
+  // Get all nodes of types (article, video), ordered by <sort order> and
+  // grouped by stickiness if <sticky applies>.
+  //
+  // For each term in the <primary vocab>
+  //   remove the first node that is tagged with that term.
+  //   output teaser for removed node
+  //
+  // For each term in the <secondary vocab>
+  //   ditto
+  //
+}
+
+// HOOK_???? When taxonomy term added or removed from primary or secondary
+//      vocab - recalculate column widths - css
+//
+// Admin settings form. When max columns changes - recalc col widths - css

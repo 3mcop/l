@@ -26,6 +26,11 @@ function lwts_custom_pages_menu() {
   return $items;
 }
 
+/*
+  // Get the top level terms from the source vocabulary.
+  $top_level_terms = taxonomy_get_tree( $source_vid, 0, 1 );
+*/
+
 /**
  * Page callback for the home page.
  */
@@ -40,14 +45,16 @@ function lwts_custom_pages_home_page() {
 
   // Get all nodes of types (article, video), ordered by <sort order> and
   // grouped by stickiness if <sticky applies>.
-  $nodes = _lwts_custom_pages_get_nodes(
+  $nodes = _lwts_custom_pages_get_node_terms(
     $sort_property,
     $is_sticky_applies,
     $vids
   );
 
-  dsm( $nodes );
-
+  foreach ( $vids as $vid ) {
+    $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
+    dsm( $tree );
+  }
   //
   // For each term in the <primary vocab>
   //   remove the first node that is tagged with that term.
@@ -79,7 +86,7 @@ function lwts_custom_pages_home_page() {
  * @return
  *   array( node_id => array(  ) )
  */
-function _lwts_custom_pages_get_nodes( $sort_property_column, $is_sticky_applies, $vids ) {
+function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids ) {
 
   // Tables required:
   // node - nid ( + sort_property )
@@ -106,11 +113,6 @@ function _lwts_custom_pages_get_nodes( $sort_property_column, $is_sticky_applies
   $query->addField( 'ttd', 'weight', 'term_weight' );
   $query->orderBy( 'term_weight', 'ASC' );
 
-  dsm( $query->__toString() );
-
-
-  dsm( $query->__toString() );
-
   $result_set =  $query->execute();
   $rows = array();
   while ( $row = $result_set->fetchAssoc() ) {
@@ -119,6 +121,72 @@ function _lwts_custom_pages_get_nodes( $sort_property_column, $is_sticky_applies
   return $rows;
 }
 
+/**
+ * Get the term IDs of a vocabulary keyed by root terms.
+ *
+ * @param $vid integer
+ *   The ID of the required vocabulary
+ *
+ * @return
+ *   array( top_level_tid => array( child_ID ) )
+ */
+function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
+
+  $terms = taxonomy_get_tree( $vid );
+  $branches = array();
+
+  // Collect terms according to parentage
+  foreach ( $terms as $term ) {
+    $tid = $term->tid;
+    $parent = $term->parents[0];  // Assumes single parent!
+
+    if ( empty($branches[$parent]) ) {
+      $branches[$parent] = array();
+      $branches[$parent]['tid'] = $parent;
+      $branches[$parent]['children'] = array();
+    }
+    $branches[$parent]['children'][$tid] = $tid;
+  }
+
+  // Build tree
+  $root = $branches['0'];
+  unset( $branches['0'] );
+  _lwts_custom_pages_assign_child_terms( &$root, &$branches );
+  return $root;
+}
+
+/**
+ * Helper fn to convert terms array to tree.
+ *
+ * @param $current_term
+ *   A term (already inserted in to the tree) that has children.
+ *   array( 'tid' => term ID, 'children' => array( term ID of child ) )
+ * @param $branches
+ *   Array of terms with children, not yet placed in tree.
+ */
+function _lwts_custom_pages_assign_child_terms( &$current_term, &$branches ) {
+
+  // Iterate through the IDs of the children of the current term.
+  foreach ( $current_term['children'] as $child_tid ) {
+
+    // Iterate through the unconnected branches.
+    foreach ( $branches as $branch ) {
+
+      // Is the branch a child of the current term?
+      if ( $child_tid === $branch['tid'] ) {
+
+        // Move the branch to its place in the heirarchy.
+        $current_term['children'][$child_tid] = $branch;
+        unset( $branches[$child_tid] );
+
+        if ( !empty( $current_term['children'][$child_tid]['children'] ) ) {
+          _lwts_custom_pages_assign_child_terms(
+            $current_term['children'][$child_tid], $branches );
+        }
+      }
+    }
+  }
+}
 
 // HOOK_???? When taxonomy term added or removed from primary or secondary
 //      vocab - recalculate column widths - css

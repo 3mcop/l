@@ -19,6 +19,7 @@ function lwts_custom_pages_menu() {
   $items['home-page'] = array (
     'title' => 'Home',
     'description' => 'See the latest from Live with the Sea',
+    'access callback' => TRUE,
     'page callback' => 'lwts_custom_pages_home_page',
   );
 
@@ -34,32 +35,90 @@ function lwts_custom_pages_home_page() {
 
   // Admin vars:
   $sort_property = 'changed';
-  $sort_order = 'DESC';
   $is_sticky_applies = TRUE;
-  $prime_vocab = 'Knowledge type';
-  $second_vocab = 'Topic';
-  $max_columns = 3;
+  $vids = array( 2, 3 );
 
   // Get all nodes of types (article, video), ordered by <sort order> and
   // grouped by stickiness if <sticky applies>.
   $nodes = _lwts_custom_pages_get_nodes(
     $sort_property,
-    $sort_order,
     $is_sticky_applies,
-    $prime_vocab,
-    $second_vocab,
-    $max_columns
+    $vids
   );
+
+  dsm( $nodes );
 
   //
   // For each term in the <primary vocab>
   //   remove the first node that is tagged with that term.
   //   output teaser for removed node
+  //foreach (
   //
   // For each term in the <secondary vocab>
   //   ditto
   //
+
+  return 'done';
 }
+
+/**
+ * Get data from nodes tagged with terms from a given set of vocabularies.
+ *
+ * @todo genericise more - sorting currently restricted to a colum in the
+ * node table, which won't work for user ratings or most visited.
+ *
+ * @param $sort_property_column string
+ *   The name of a column in the node table on which to sort
+ * @param $is_sticky_applies boolean
+ *   Should sticky nodes come at the top of the list?
+ * @param $vids array( integer )
+ *   The set of vocabulary ids that should be considered.
+ * @param $max_nodes integer
+ *   The maximum number of nodes to load.
+ *
+ * @return
+ *   array( node_id => array(  ) )
+ */
+function _lwts_custom_pages_get_nodes( $sort_property_column, $is_sticky_applies, $vids ) {
+
+  // Tables required:
+  // node - nid ( + sort_property )
+  // taxonomy_vocabulary - name
+  // taxonomy_term_data - to connect vocab to terms
+  // taxonomy_index - for node-term join
+  //
+  $query = db_select( 'node', 'n' );
+  $query->join( 'taxonomy_index', 'ti', 'ti.nid = n.nid' );
+  $query->join( 'taxonomy_term_data', 'ttd', 'ttd.tid = ti.tid' );
+  $query->join( 'taxonomy_vocabulary', 'tv', 'tv.vid = ttd.vid' );
+  $query->condition( 'tv.vid', $vids, 'IN' );
+  $query->addField( 'n', 'nid', 'node_id' );
+  $query->addField( 'ttd', 'tid', 'term_id' );
+  $query->addField( 'tv', 'vid', 'vocab_id' );
+
+  if ( $is_sticky_applies ) {
+    $query->addField( 'n', 'sticky', 'node_sticky' );
+    $query->orderBy( 'node_sticky', 'DESC' );
+  }
+
+  $query->addField( 'n', $sort_property_column, 'sort_col' );
+  $query->orderBy( 'sort_col', 'DESC' );
+  $query->addField( 'ttd', 'weight', 'term_weight' );
+  $query->orderBy( 'term_weight', 'ASC' );
+
+  dsm( $query->__toString() );
+
+
+  dsm( $query->__toString() );
+
+  $result_set =  $query->execute();
+  $rows = array();
+  while ( $row = $result_set->fetchAssoc() ) {
+    $rows[ $row['node_id'] ][ $row['term_id'] ] = $row['term_id'];
+  }
+  return $rows;
+}
+
 
 // HOOK_???? When taxonomy term added or removed from primary or secondary
 //      vocab - recalculate column widths - css

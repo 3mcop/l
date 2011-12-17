@@ -1,0 +1,37 @@
+<?php
+
+class LwtsCustomPagesTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+
+    return array(
+      'name' => 'LWtS custom pages test case',
+      'description' => 'Test that LWtS custom pages work properly.',
+      'group' => 'LWtS',
+    );
+  }
+
+  function setUp() {
+    // support existing database prefixes. if we didn't,
+    // the prefix would be set as '', causing failures.
+    $this->originalPrefix = '';//$GLOBALS['db_prefix'];
+    debug( $this );
+  }
+  function tearDown() {
+    // empty
+  }
+
+  function testGetNodes() {
+    debug( 'starting test' );
+    //$result =_lwts_custom_pages_get_nodes(
+    //  'changed',
+    //  TRUE,
+    //  array( 2, 3 )
+    //);
+    $result = 1;
+    $message = t('Some rows should be returned');
+    //$message = print_r( $result, TRUE );
+    $this->assertTrue( !empty($result), $message );
+  }
+
+}

@@ -3,3 +3,4 @@ description = "Pages specific to LWtS that were prohibitively difficult to do us
 package = Live With the Sea
 core = 7.x
 
+files[] = lwts_custom_pages.test

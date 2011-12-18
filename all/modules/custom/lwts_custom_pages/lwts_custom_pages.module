@@ -54,6 +54,8 @@ function lwts_custom_pages_home_page() {
   foreach ( $vids as $vid ) {
     $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
     dsm( $tree );
+    $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
+    dsm( $top_level_terms );
   }
   //
   // For each term in the <primary vocab>
@@ -138,15 +140,18 @@ function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
   // Collect terms according to parentage
   foreach ( $terms as $term ) {
     $tid = $term->tid;
-    $parent = $term->parents[0];  // Assumes single parent!
+    $parent = $term->parents[0];  // HACK - Assumes single parent!
 
     if ( empty($branches[$parent]) ) {
       $branches[$parent] = array();
       $branches[$parent]['tid'] = $parent;
       $branches[$parent]['children'] = array();
     }
-    $branches[$parent]['children'][$tid] = $tid;
+    $branches[$parent]['children'][$tid] =
+      array( 'tid' => $tid, 'children' => array() );
   }
+
+  dsm( $branches );
 
   // Build tree
   $root = $branches['0'];
@@ -167,26 +172,74 @@ function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
 function _lwts_custom_pages_assign_child_terms( &$current_term, &$branches ) {
 
   // Iterate through the IDs of the children of the current term.
-  foreach ( $current_term['children'] as $child_tid ) {
+  foreach ( $current_term['children'] as $child ) {
 
     // Iterate through the unconnected branches.
     foreach ( $branches as $branch ) {
 
       // Is the branch a child of the current term?
-      if ( $child_tid === $branch['tid'] ) {
+      if ( $child['tid'] === $branch['tid'] ) {
 
         // Move the branch to its place in the heirarchy.
-        $current_term['children'][$child_tid] = $branch;
-        unset( $branches[$child_tid] );
+        $current_term['children'][ $child['tid'] ] = $branch;
+        unset( $branches[$child['tid']] );
 
-        if ( !empty( $current_term['children'][$child_tid]['children'] ) ) {
+        if ( !empty( $current_term['children'][ $child['tid'] ]['children'] ) ) {
           _lwts_custom_pages_assign_child_terms(
-            $current_term['children'][$child_tid], $branches );
+            $current_term['children'][ $child['tid'] ], $branches );
         }
       }
     }
   }
 }
+
+/**
+ * In a vocab tree, make all terms immediate children of top level terms.
+ *
+ * @param $tree
+ *   A vocabulary tree as returned by _lwts_custom_pages_get_vocabulary_tree
+ *
+ * @return
+ *   array( top_level_term_ID => array( all sub term IDs of any depth )
+ */
+function _lwts_custom_pages_compress_vocabulary_tree( $tree ) {
+
+  $top_level_terms = array();
+  foreach ( $tree['children'] as $top_level_term ) {
+    foreach ( $top_level_term['children'] as $sub_term ) {
+      _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_term );
+    }
+    $top_level_terms[] = $top_level_term;
+  }
+
+  $result = array();
+  foreach ( $top_level_terms as $top_level_term ) {
+    $result[ $top_level_term['tid'] ] = $top_level_term['children'];
+  }
+  return $result;
+}
+
+function _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_term ) {
+
+  if( $top_level_term['tid'] == 23 ) { dsm( func_get_args() ); }
+
+  // Copy children of the sub_term so that they do not get overwritten.
+  $sub_sub_terms = $sub_term['children'];
+
+  // Add the ID of the sun_term to the children of the top level term,
+  // replacing the existing associative array.
+  $top_level_term['children'][ $sub_term['tid'] ] = $sub_term['tid'];
+
+  if( $top_level_term['tid'] == 23 ) { dsm( array(
+    'sub_sub_terms' => $sub_sub_terms, 'top_level_term' => $top_level_term
+  ) ); }
+
+  foreach( $sub_sub_terms as $sub_sub_term ) {
+    _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_sub_term );
+  }
+}
+
+
 
 // HOOK_???? When taxonomy term added or removed from primary or secondary
 //      vocab - recalculate column widths - css

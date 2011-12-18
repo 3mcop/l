@@ -204,38 +204,48 @@ function _lwts_custom_pages_assign_child_terms( &$current_term, &$branches ) {
  */
 function _lwts_custom_pages_compress_vocabulary_tree( $tree ) {
 
+  // Add the IDs of all sub-terms, of any depth, to the children of the
+  // top level term.
   $top_level_terms = array();
   foreach ( $tree['children'] as $top_level_term ) {
     foreach ( $top_level_term['children'] as $sub_term ) {
-      _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_term );
+      _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term );
     }
     $top_level_terms[] = $top_level_term;
   }
 
+  // Simplify the structure of the top level term array from
+  //   array( 'tid' => ID, 'children' => array( IDs ) )
+  // to
+  //   array( ID => array( own/sub-term ID => own/sub-term ID ) )
   $result = array();
   foreach ( $top_level_terms as $top_level_term ) {
     $result[ $top_level_term['tid'] ] = $top_level_term['children'];
+    $result[ $top_level_term['tid'] ][ $top_level_term['tid'] ] =
+      $top_level_term['tid'];
   }
   return $result;
 }
 
-function _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_term ) {
-
-  if( $top_level_term['tid'] == 23 ) { dsm( func_get_args() ); }
+/**
+ * Add the sub-term ID to the children of the top level term.
+ *
+ * @param $top_level_term
+ *   Top level taxonomy term. array( 'tid' => ID, 'children' => array() )
+ * @param $sub_term
+ *   A taxonomy term of depth > 1. Same structure as top level term.
+ */
+function _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term ) {
 
   // Copy children of the sub_term so that they do not get overwritten.
   $sub_sub_terms = $sub_term['children'];
 
-  // Add the ID of the sun_term to the children of the top level term,
+  // Add the ID of the sub_term to the children of the top level term,
   // replacing the existing associative array.
   $top_level_term['children'][ $sub_term['tid'] ] = $sub_term['tid'];
 
-  if( $top_level_term['tid'] == 23 ) { dsm( array(
-    'sub_sub_terms' => $sub_sub_terms, 'top_level_term' => $top_level_term
-  ) ); }
-
   foreach( $sub_sub_terms as $sub_sub_term ) {
-    _lwts_custom_pages_add_terms_to_top_level( &$top_level_term, $sub_sub_term );
+    _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_sub_term );
   }
 }
 

@@ -36,38 +36,42 @@ function lwts_custom_pages_menu() {
  */
 function lwts_custom_pages_home_page() {
 
-  // No need for a primary topic field when done this way!!!!!
-
   // Admin vars:
-  $sort_property = 'changed';
+  $sort_property = 'created';
   $is_sticky_applies = TRUE;
   $vids = array( 2, 3 );
 
   // Get all nodes of types (article, video), ordered by <sort order> and
   // grouped by stickiness if <sticky applies>.
-  $nodes = _lwts_custom_pages_get_node_terms(
+  $node_terms = _lwts_custom_pages_get_node_terms(
     $sort_property,
     $is_sticky_applies,
     $vids
   );
+  dsm( $node_terms );
+
+  $result = '<div class="lwts-custom-page-content">';
 
   foreach ( $vids as $vid ) {
     $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
     dsm( $tree );
     $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
     dsm( $top_level_terms );
-  }
-  //
-  // For each term in the <primary vocab>
-  //   remove the first node that is tagged with that term.
-  //   output teaser for removed node
-  //foreach (
-  //
-  // For each term in the <secondary vocab>
-  //   ditto
-  //
 
-  return 'done';
+    $nodes_to_display = _lwts_custom_pages_get_nodes_to_display(
+      &$node_terms, $top_level_terms );
+    dsm( $nodes_to_display );
+
+    $result .= '<div class="vocabulary vocabulary-' . $vid . '">';
+    // Output teaser for removed node
+    foreach ( $nodes_to_display as $term_id => $node_id ) {
+      $result .= _lwts_custom_pages_get_rendered_node( $term_id, $node_id );
+    }
+    $result .= '</div>';
+  }
+  $result .= '</div>';
+dsm( $result );
+  return $result;
 }
 
 /**
@@ -150,8 +154,6 @@ function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
     $branches[$parent]['children'][$tid] =
       array( 'tid' => $tid, 'children' => array() );
   }
-
-  dsm( $branches );
 
   // Build tree
   $root = $branches['0'];
@@ -248,6 +250,53 @@ function _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $su
     _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_sub_term );
   }
 }
+
+/**
+ * For each top level term, get a unique node tagged with that term.
+ *
+ * @param $node_terms
+ *   array( Node ID => array( term IDs ) )
+ * @param $top_level_terms
+ *   array( top level term ID => array( top level + sub-term IDs ) )
+ *
+ * @return
+ *   A set of unique nodes. array( top level term ID => node ID )
+ */
+function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms ) {
+
+  $result = array();
+
+  foreach ( $top_level_terms as $top_level_term_id => $term_descendants ) {
+
+    reset( $node_terms );
+
+    // Iterate through available nodes.
+    while ( list( $node_id, $node_term_set ) = each( $node_terms ) ) {
+
+      // Is this node tagged with the current term or its descendants?
+      if ( array_intersect( $node_term_set, $term_descendants ) ) {
+
+        // Found a node to display. Remove it from array and exit loop.
+        $result[$top_level_term_id] = $node_id;
+        unset( $node_terms[$node_id] );
+        break;
+      }
+    }
+  }
+  return $result;
+}
+
+function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
+
+  // get term name
+  // div - term name
+  // render term name
+  // render node as teaser
+  // close div - term name
+  
+  return 'Node ' . $node_id . '<br/>';
+}
+
 
 
 

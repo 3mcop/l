@@ -70,7 +70,7 @@ function lwts_custom_pages_home_page() {
     $result .= '</div>';
   }
   $result .= '</div>';
-dsm( $result );
+
   return $result;
 }
 
@@ -288,13 +288,27 @@ function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms
 
 function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
 
+  $result = '';
+
   // get term name
+  $term = taxonomy_term_load( $term_id );
+  $clean_term_name = strtolower( str_replace( ' ', '-', $term->name ) );
+
   // div - term name
+  $result .= '<div class="taxonomy-term taxonomy-term-' . $term_id . ' ' . $clean_term_name . '">';
+
   // render term name
+  $result .= '<h3>' . $term->name . '</h3>';
+
   // render node as teaser
-  // close div - term name
+  $result .= '<div class="term-related-node">';
+  $result .= drupal_render( node_view( node_load( $node_id ), 'teaser' ) );
+  $result .= '</div>';
   
-  return 'Node ' . $node_id . '<br/>';
+  // close div - term name
+  $result .= '</div>';
+
+  return $result;
 }
 
 

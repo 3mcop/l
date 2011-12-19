@@ -48,22 +48,21 @@ function lwts_custom_pages_home_page() {
     $is_sticky_applies,
     $vids
   );
-  dsm( $node_terms );
+  //dsm( $node_terms );
 
   $result = '<div class="lwts-custom-page-content">';
 
   foreach ( $vids as $vid ) {
     $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
-    dsm( $tree );
+    //dsm( $tree );
     $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
-    dsm( $top_level_terms );
+    //dsm( $top_level_terms );
 
     $nodes_to_display = _lwts_custom_pages_get_nodes_to_display(
       &$node_terms, $top_level_terms );
-    dsm( $nodes_to_display );
+    //dsm( $nodes_to_display );
 
     $result .= '<div class="vocabulary vocabulary-' . $vid . '">';
-    // Output teaser for removed node
     foreach ( $nodes_to_display as $term_id => $node_id ) {
       $result .= _lwts_custom_pages_get_rendered_node( $term_id, $node_id );
     }

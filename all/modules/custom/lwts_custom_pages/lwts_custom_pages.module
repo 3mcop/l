@@ -95,7 +95,7 @@ function _lwts_custom_pages_get_page_config( $page_id, $required_term ) {
 
   if ( !empty( $required_term ) ) {
     $term = array_pop( taxonomy_get_term_by_name( $required_term ) );
-    dsm( $term );
+    //dsm( $term );
     $required_term = $term->tid;
   }
 

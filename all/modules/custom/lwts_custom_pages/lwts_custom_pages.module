@@ -78,8 +78,8 @@ function _lwts_custom_pages_page_callback() {
         $term_id, $node_id, 'teaser' );
       if ( ( $index % $num_cols ) == 0 ) {
         $result .= '</div><div class="lwts-custom-page-row">';
-        $index++;
       }
+      $index++;
     }
     $result .= '</div></div>';
   }

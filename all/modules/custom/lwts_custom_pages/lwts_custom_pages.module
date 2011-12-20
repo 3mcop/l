@@ -82,9 +82,13 @@ function _lwts_custom_pages_page_callback() {
     $result .= '<div class="vocabulary ' . $class . ' clearfix">';
     $result .= '<div class="lwts-custom-page-row clearfix">';
     $index = 1;
-    foreach ( $nodes_to_display as $term_id => $node_id ) {
+    foreach ( $nodes_to_display as $term_id => $node ) {
+
+      $classes = in_array( 1, $node['terms'] ) ? 'education' : 'action';
       $result .= _lwts_custom_pages_get_rendered_node(
-        $term_id, $node_id, 'teaser' );
+        $term_id, $node['nid'], 'teaser', $classes );
+
+      // Was this the last node in the row?
       if ( ( $index % $num_cols ) == 0 ) {
         $result .= '</div><div class="lwts-custom-page-row clearfix">';
       }
@@ -356,7 +360,8 @@ function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms
       if ( array_intersect( $node_term_set, $term_descendants ) ) {
 
         // Found a node to display. Remove it from array and exit loop.
-        $result[$top_level_term_id] = $node_id;
+        $result[$top_level_term_id]['nid'] = $node_id;
+        $result[$top_level_term_id]['terms'] = $node_term_set;
         unset( $node_terms[$node_id] );
         break;
       }
@@ -394,11 +399,13 @@ function _lwts_custom_pages_get_css( $vocab_class, $num_cols ) {
  *   The ID of the node to be displayed.
  * @param $view
  *   The kind of view to show, e.g. 'teaser', 'full', 'something-else'
+ * @param $classes
+ *   As string containing any classes to be added to the node-wrapping div.
  *
  * @return
  *   Returns the markup for the term-related node.
  */
-function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view ) {
+function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view, $classes ) {
 
   $result = '';
 
@@ -407,7 +414,8 @@ function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view ) {
   $clean_term_name = strtolower( str_replace( ' ', '-', $term->name ) );
 
   // div - term name
-  $result .= '<div class="taxonomy-term taxonomy-term-' . $term_id . ' ' . $clean_term_name . '">';
+  $result .= '<div class="taxonomy-term taxonomy-term-' . $term_id . ' ' .
+    $clean_term_name . ' ' . $classes . '">';
 
   // render term name
   $result .= '<h3>' . $term->name . '</h3>';

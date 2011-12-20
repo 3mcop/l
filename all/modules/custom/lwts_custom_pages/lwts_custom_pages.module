@@ -57,7 +57,7 @@ function _lwts_custom_pages_page_callback() {
     $config->sort_property,
     $config->is_sticky_applies,
     $config->vids,
-    $required_term->tid
+    empty($required_term) ? NULL : $required_term->tid
   );
   //dsm( $node_terms );
 

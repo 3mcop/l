@@ -71,13 +71,13 @@ function _lwts_custom_pages_page_callback() {
       array( 'type' => 'inline' ) );
 
     $result .= '<div class="vocabulary ' . $class . ' clearfix">';
-    $result .= '<div class="lwts-custom-page-row">';
+    $result .= '<div class="lwts-custom-page-row clearfix">';
     $index = 1;
     foreach ( $nodes_to_display as $term_id => $node_id ) {
       $result .= _lwts_custom_pages_get_rendered_node(
         $term_id, $node_id, 'teaser' );
       if ( ( $index % $num_cols ) == 0 ) {
-        $result .= '</div><div class="lwts-custom-page-row">';
+        $result .= '</div><div class="lwts-custom-page-row clearfix">';
       }
       $index++;
     }

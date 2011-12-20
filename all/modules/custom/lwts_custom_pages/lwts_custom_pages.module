@@ -40,6 +40,7 @@ function lwts_custom_pages_home_page() {
   $sort_property = 'created';
   $is_sticky_applies = TRUE;
   $vids = array( 2, 3 );
+  $max_cols = 3;
 
   // Get all nodes of types (article, video), ordered by <sort order> and
   // grouped by stickiness if <sticky applies>.
@@ -62,7 +63,12 @@ function lwts_custom_pages_home_page() {
       &$node_terms, $top_level_terms );
     //dsm( $nodes_to_display );
 
-    $result .= '<div class="vocabulary vocabulary-' . $vid . '">';
+    $class = 'vocabulary-' . $vid;
+    $num_cols = min( count( $top_level_terms ), $max_cols );
+    drupal_add_css( _lwts_custom_pages_get_css( $class, $num_cols ),
+      array( 'type' => 'inline' ) );
+
+    $result .= '<div class="vocabulary ' . $class . ' clearfix">';
     foreach ( $nodes_to_display as $term_id => $node_id ) {
       $result .= _lwts_custom_pages_get_rendered_node( $term_id, $node_id );
     }
@@ -285,6 +291,14 @@ function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms
   return $result;
 }
 
+function _lwts_custom_pages_get_css( $class, $num_cols ) {
+
+  $width = ( 100.0 / $num_cols ) - 2.0;
+  $css = '.' . $class . ' .taxonomy-term{float:left;width:' . $width . '%;padding:0 0.5em;}';
+  dsm( $css );
+  return $css;
+}
+
 function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
 
   $result = '';
@@ -300,7 +314,7 @@ function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
   $result .= '<h3>' . $term->name . '</h3>';
 
   // render node as teaser
-  $result .= '<div class="term-related-node">';
+  $result .= '<div class="term-related-node clearfix">';
   $result .= drupal_render( node_view( node_load( $node_id ), 'teaser' ) );
   $result .= '</div>';
   

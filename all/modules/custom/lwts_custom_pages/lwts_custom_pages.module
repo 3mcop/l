@@ -40,7 +40,16 @@ function lwts_custom_pages_menu() {
 function _lwts_custom_pages_page_callback() {
 
   $page_id = arg(0);
-  $config = _lwts_custom_pages_get_page_config( $page_id, arg(1) );
+  $required_term_name = arg(1);
+  $config = _lwts_custom_pages_get_page_config( $page_id );
+  if ( !empty( $required_term_name ) ) {
+    $required_term = array_pop( taxonomy_get_term_by_name( arg(1)) );
+    //dsm( $required_term);
+    drupal_set_title( $required_term->name );
+  }
+  else {
+    $required_term = NULL;
+  }
 
   // Get the terms for each node that is tagged with a term from the
   // relevant vocabularies.
@@ -48,7 +57,7 @@ function _lwts_custom_pages_page_callback() {
     $config->sort_property,
     $config->is_sticky_applies,
     $config->vids,
-    $config->required_term
+    $required_term->tid
   );
   //dsm( $node_terms );
 
@@ -88,16 +97,13 @@ function _lwts_custom_pages_page_callback() {
   return $result;
 }
 
-function _lwts_custom_pages_get_page_config( $page_id, $required_term ) {
+function _lwts_custom_pages_get_required_term( $term_name ) {
+}
+
+function _lwts_custom_pages_get_page_config( $page_id ) {
 
   // HACK// HACK// HACK// HACK// HACK// HACK      // HACK!!!!!!
   // Replace switch with variable_get() calls and per-page config pages.
-
-  if ( !empty( $required_term ) ) {
-    $term = array_pop( taxonomy_get_term_by_name( $required_term ) );
-    //dsm( $term );
-    $required_term = $term->tid;
-  }
 
   $result = new StdClass;
 
@@ -107,14 +113,12 @@ function _lwts_custom_pages_get_page_config( $page_id, $required_term ) {
     $result->is_sticky_applies = TRUE;
     $result->vids = array( 2, 3 );
     $result->max_cols = 3;
-    $result->required_term = NULL;
     break;
   case 'origin' :
     $result->sort_property = 'created';
     $result->is_sticky_applies = TRUE;
     $result->vids = array( 2, 3 );
     $result->max_cols = 3;
-    $result->required_term = $required_term;
     break;
   }
   return $result;
@@ -134,11 +138,13 @@ function _lwts_custom_pages_get_page_config( $page_id, $required_term ) {
  *   The set of vocabulary ids that should be considered.
  * @param $max_nodes integer
  *   The maximum number of nodes to load.
+ * @param $required_tid
+ *   The ID of the term that returned nodes must be tagged with, else NULL.
  *
  * @return
  *   array( node_id => array(  ) )
  */
-function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids, $required_term ) {
+function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids, $required_tid ) {
 
   // Tables required:
   // node - nid ( + sort_property )
@@ -164,7 +170,7 @@ function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_ap
   if ( !empty( $required_term ) ) {
     $subquery = db_select( 'taxonomy_index', 'ti' );
     $subquery->addField( 'ti', 'nid', 'node_id' );
-    $subquery->condition( 'ti.tid', $required_term );
+    $subquery->condition( 'ti.tid', $required_tid );
     $query->condition( 'n.nid', $subquery, 'IN' );
   }
 

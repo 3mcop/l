@@ -20,40 +20,42 @@ function lwts_custom_pages_menu() {
     'title' => 'Home',
     'description' => 'See the latest from Live with the Sea',
     'access callback' => TRUE,
-    'page callback' => 'lwts_custom_pages_home_page',
+    'page callback' => '_lwts_custom_pages_page_callback',
+  );
+
+  // Wildcard is a taxonomy term name.
+  $items['origin/%'] = array (
+    'title' => 'origin',
+    'description' => 'See the latest articles from a specific location',
+    'access callback' => TRUE,
+    'page callback' => '_lwts_custom_pages_page_callback',
   );
 
   return $items;
 }
 
-/*
-  // Get the top level terms from the source vocabulary.
-  $top_level_terms = taxonomy_get_tree( $source_vid, 0, 1 );
-*/
-
 /**
  * Page callback for the home page.
  */
-function lwts_custom_pages_home_page() {
+function _lwts_custom_pages_page_callback() {
 
-  // Admin vars:
-  $sort_property = 'created';
-  $is_sticky_applies = TRUE;
-  $vids = array( 2, 3 );
-  $max_cols = 3;
+  $page_id = arg(0);
+  $config = _lwts_custom_pages_get_page_config( $page_id, arg(1) );
 
-  // Get all nodes of types (article, video), ordered by <sort order> and
-  // grouped by stickiness if <sticky applies>.
+  // Get the terms for each node that is tagged with a term from the
+  // relevant vocabularies.
   $node_terms = _lwts_custom_pages_get_node_terms(
-    $sort_property,
-    $is_sticky_applies,
-    $vids
+    $config->sort_property,
+    $config->is_sticky_applies,
+    $config->vids,
+    $config->required_term
   );
   //dsm( $node_terms );
 
-  $result = '<div class="lwts-custom-page-content">';
+  $result =
+    '<div class="lwts-custom-page lwts-custom-page-' . $page_id . '">';
 
-  foreach ( $vids as $vid ) {
+  foreach ( $config->vids as $vid ) {
     $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
     //dsm( $tree );
     $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
@@ -64,18 +66,51 @@ function lwts_custom_pages_home_page() {
     //dsm( $nodes_to_display );
 
     $class = 'vocabulary-' . $vid;
-    $num_cols = min( count( $top_level_terms ), $max_cols );
+    $num_cols = min( count( $top_level_terms ), $config->max_cols );
     drupal_add_css( _lwts_custom_pages_get_css( $class, $num_cols ),
       array( 'type' => 'inline' ) );
 
     $result .= '<div class="vocabulary ' . $class . ' clearfix">';
     foreach ( $nodes_to_display as $term_id => $node_id ) {
-      $result .= _lwts_custom_pages_get_rendered_node( $term_id, $node_id );
+      $result .= _lwts_custom_pages_get_rendered_node(
+        $term_id, $node_id, 'teaser' );
     }
     $result .= '</div>';
   }
   $result .= '</div>';
 
+  return $result;
+}
+
+function _lwts_custom_pages_get_page_config( $page_id, $required_term ) {
+
+  // HACK// HACK// HACK// HACK// HACK// HACK      // HACK!!!!!!
+  // Replace switch with variable_get() calls and per-page config pages.
+
+  if ( !empty( $required_term ) ) {
+    $term = array_pop( taxonomy_get_term_by_name( $required_term ) );
+    dsm( $term );
+    $required_term = $term->tid;
+  }
+
+  $result = new StdClass;
+
+  switch ( $page_id ) {
+  case 'home-page' :
+    $result->sort_property = 'created';
+    $result->is_sticky_applies = TRUE;
+    $result->vids = array( 2, 3 );
+    $result->max_cols = 3;
+    $result->required_term = NULL;
+    break;
+  case 'origin' :
+    $result->sort_property = 'created';
+    $result->is_sticky_applies = TRUE;
+    $result->vids = array( 2, 3 );
+    $result->max_cols = 3;
+    $result->required_term = $required_term;
+    break;
+  }
   return $result;
 }
 
@@ -97,7 +132,7 @@ function lwts_custom_pages_home_page() {
  * @return
  *   array( node_id => array(  ) )
  */
-function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids ) {
+function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids, $required_term ) {
 
   // Tables required:
   // node - nid ( + sort_property )
@@ -109,27 +144,54 @@ function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_ap
   $query->join( 'taxonomy_index', 'ti', 'ti.nid = n.nid' );
   $query->join( 'taxonomy_term_data', 'ttd', 'ttd.tid = ti.tid' );
   $query->join( 'taxonomy_vocabulary', 'tv', 'tv.vid = ttd.vid' );
-  $query->condition( 'tv.vid', $vids, 'IN' );
   $query->addField( 'n', 'nid', 'node_id' );
   $query->addField( 'ttd', 'tid', 'term_id' );
-  $query->addField( 'tv', 'vid', 'vocab_id' );
+  $query->condition( 'tv.vid', $vids, 'IN' );
 
   if ( $is_sticky_applies ) {
-    $query->addField( 'n', 'sticky', 'node_sticky' );
-    $query->orderBy( 'node_sticky', 'DESC' );
+    $query->orderBy( 'n.sticky', 'DESC' );
   }
 
-  $query->addField( 'n', $sort_property_column, 'sort_col' );
-  $query->orderBy( 'sort_col', 'DESC' );
-  $query->addField( 'ttd', 'weight', 'term_weight' );
-  $query->orderBy( 'term_weight', 'ASC' );
+  $query->orderBy( 'n.' . $sort_property_column, 'DESC' );
+  $query->orderBy( 'ttd.weight', 'ASC' );
+
+  if ( !empty( $required_term ) ) {
+    $subquery = db_select( 'taxonomy_index', 'ti' );
+    $subquery->addField( 'ti', 'nid', 'node_id' );
+    $subquery->condition( 'ti.tid', $required_term );
+    $query->condition( 'n.nid', $subquery, 'IN' );
+  }
 
   $result_set =  $query->execute();
   $rows = array();
   while ( $row = $result_set->fetchAssoc() ) {
     $rows[ $row['node_id'] ][ $row['term_id'] ] = $row['term_id'];
   }
+
+  //if ( !empty( $required_term ) ) {
+  //  global $_lwts_custom_pages_required_term;
+  //  $_lwts_custom_pages_required_term = $required_term;
+  //  $rows = array_filter(
+  //    $rows, '_lwts_custom_pages_includes_required_term' );
+  //}
   return $rows;
+}
+
+/**
+ * Do the given terms include the (global) required term?
+ *
+ * Callback fn for array_filter.
+ * Helper fn for _lwts_custom_pages_get_node_terms
+ *
+ * @param $terms
+ *   An array of term IDs
+ *
+ * @return
+ *   TRUE if the required term is present, else FALSE;
+ */
+function _lwts_custom_pages_includes_required_term( $terms ) {
+  global $_lwts_custom_pages_required_term;
+  return in_array( $_lwts_custom_pages_required_term, $terms );
 }
 
 /**
@@ -291,15 +353,40 @@ function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms
   return $result;
 }
 
-function _lwts_custom_pages_get_css( $class, $num_cols ) {
+/**
+ * Get the CSS necessary to make the page look panel-like.
+ *
+ * @param $vocab_class
+ *   An (html attribute) class that identifies a given vocabulary.
+ * @param $num_cols
+ *   The number of columns for the given vocabulary.
+ *
+ * @return
+ *   A string containing CSS for taxonomy-term "panes".
+ */
+function _lwts_custom_pages_get_css( $vocab_class, $num_cols ) {
 
   $width = ( 100.0 / $num_cols ) - 2.0;
-  $css = '.' . $class . ' .taxonomy-term{float:left;width:' . $width . '%;padding:0 0.5em;}';
-  dsm( $css );
+  $css = '.' . $vocab_class . ' .taxonomy-term{float:left;width:' .
+    $width . '%;padding:0 0.5em;}';
+  //dsm( $css );
   return $css;
 }
 
-function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
+/**
+ * Get the markup to show a given term-related node.
+ *
+ * @param $term_id
+ *   The ID of the term that the node is related to.
+ * @param $node_id
+ *   The ID of the node to be displayed.
+ * @param $view
+ *   The kind of view to show, e.g. 'teaser', 'full', 'something-else'
+ *
+ * @return
+ *   Returns the markup for the term-related node.
+ */
+function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view ) {
 
   $result = '';
 
@@ -315,7 +402,7 @@ function _lwts_custom_pages_get_rendered_node( $term_id, $node_id ) {
 
   // render node as teaser
   $result .= '<div class="term-related-node clearfix">';
-  $result .= drupal_render( node_view( node_load( $node_id ), 'teaser' ) );
+  $result .= drupal_render( node_view( node_load( $node_id ), $view ) );
   $result .= '</div>';
   
   // close div - term name

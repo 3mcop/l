@@ -28,10 +28,48 @@ function lwts_custom_pages_menu() {
     'title' => 'origin',
     'description' => 'See the latest articles from a specific location',
     'access callback' => TRUE,
-    'page callback' => '_lwts_custom_pages_page_callback',
+    'page callback' => '_lwts_custom_pages_page_callback2',
   );
 
   return $items;
+}
+
+
+function _lwts_custom_pages_page_callback2() {
+
+  $topics_vid = 3;
+  $top_level_topics = taxonomy_get_tree( $topics_vid, 0, 1 );
+  $view_term_depth = 10;
+  $view_template = views_get_view('get_top_article');
+
+  $result = '<div class="views-set views-set-get-top-article">';
+
+  foreach ( $top_level_topics as $term ) {
+    $view = $view_template->clone_view();
+    $view_output = $view->preview('default', $term->tid, $view_term_depth );
+    $node_id = $view->result[0]->nid;
+    $knowledge_type =
+      _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
+
+    $result .= '<div class="' . $knowledge_type . '">';
+    $result .= $view_output;
+    $result .= '</div>';
+  }
+  $result .= '</div>';
+
+  return $result;
+}
+
+
+function _lwts_custom_pages_get_knowledge_type_css_class( $node_id ) {
+  $node = node_load( $node_id );
+  $lang = $node->language;
+  $tid = $node->field_knowledge_type[$lang][0]['tid'];
+
+  // ULTRA HACK - fragile - change to vocabulary will break this.
+  $css_class = ( $tid == 1 ? 'Education' : 'Action' );
+
+  return $css_class;
 }
 
 /**

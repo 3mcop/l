@@ -84,7 +84,10 @@ function _lwts_custom_pages_page_callback() {
     $index = 1;
     foreach ( $nodes_to_display as $term_id => $node ) {
 
-      $classes = in_array( 1, $node['terms'] ) ? 'education' : 'action';
+      // HALF A HACK - Hard coded term names - it does stop a renamed
+      // taxonomy from spoiling the CSS.
+      $classes = in_array( 1, $node['terms'] ) ? 'Education' : 'Action';
+
       $result .= _lwts_custom_pages_get_rendered_node(
         $term_id, $node['nid'], 'teaser', $classes );
 

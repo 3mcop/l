@@ -173,16 +173,16 @@ function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term 
       $result .=
         '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
       $result .= $view_output;
-      $result .= '</div>'; //view
-    }
+      $result .= '</div>'; // view-pane
 
-    // Show titles of other articles for the current topic.
-    $view = $titles_view_template->clone_view();
-    $result .= '<div class="lwts-custom-page-view-pane">';
-    $result .= $view->preview( 'default', array(
-      $constraint, $topic->tid, $topic_depth, $top_article_nid
-    ) );
-    $result .= '</div>'; // view-pane
+      // Show titles of other articles for the current topic.
+      $view = $titles_view_template->clone_view();
+      $result .= '<div class="lwts-custom-page-view-pane">';
+      $result .= $view->preview( 'default', array(
+        $constraint, $topic->tid, $topic_depth, $top_article_nid
+      ) );
+      $result .= '</div>'; // view-pane
+    }
 
     $result .= '</div>'; // row
   }

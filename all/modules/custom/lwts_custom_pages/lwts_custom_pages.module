@@ -23,22 +23,48 @@ function lwts_custom_pages_menu() {
     'page callback' => '_lwts_custom_pages_page_callback',
   );
 
-  // Wildcard is a taxonomy term name.
+  // Country page
+  // Wildcard is the name of taxonomy term from the Location vocabulary.
   $items['origin/%'] = array (
     'title' => 'origin',
     'description' => 'See the latest articles from a specific location',
     'access callback' => TRUE,
-    'page callback' => '_lwts_custom_pages_page_callback2',
+    'page callback' => '_lwts_custom_pages_country_page',
+    'page arguments' => array( 1 ),
+  );
+
+  // Topic page
+  // Wildcard is the name of taxonomy term from the Topic vocabulary.
+  $items['topic/%'] = array (
+    'title' => 'Topic',
+    'description' => 'See the latest articles for a given topic',
+    'access callback' => TRUE,
+    'page callback' => '_lwts_custom_pages_topic_page',
     'page arguments' => array( 1 ),
   );
 
   return $items;
 }
 
+function _lwts_get_term_from_name( $term_name ) {
+  
+  $terms = taxonomy_get_term_by_name( $term_name );
 
-function _lwts_custom_pages_page_callback2( $location_name ) {
+  if ( empty( $terms ) ) {
+    $term_name = str_replace( '-', ' ', $term_name );
+  }
 
-  $location = array_pop( taxonomy_get_term_by_name( $location_name ) );
+  $terms = taxonomy_get_term_by_name( $term_name );
+
+  return empty( $terms ) ? NULL : array_pop( $terms );
+}
+
+function _lwts_custom_pages_country_page( $location_name ) {
+
+  $location = _lwts_get_term_from_name( $location_name );
+  if ( ! $location ) {
+    return MENU_NOT_FOUND;
+  }
   drupal_set_title( $location->name );
 
   $topics_vid = 3;
@@ -83,6 +109,65 @@ function _lwts_custom_pages_page_callback2( $location_name ) {
     $result .= '<div class="lwts-custom-page-view">';
     $result .= $view->preview( 'default', array(
       $location->tid, $topic->tid, $view_term_depth, $top_article_nid
+    ) );
+    $result .= '</div>'; //view
+
+    $result .= '</div>'; // row
+  }
+  $result .= '</div>'; // page
+
+  return $result;
+}
+
+function _lwts_custom_pages_topic_page( $topic_name ) {
+
+  $topic = _lwts_get_term_from_name( $topic_name );
+  if ( ! $topic ) {
+    return MENU_NOT_FOUND;
+  }
+  drupal_set_title( $topic->name );
+
+  $sub_topics = taxonomy_get_tree( $topic->vid, $topic->tid, 1 );
+  $view_term_depth = 10;
+  $teaser_view_template = views_get_view('get_one_article');
+  $titles_view_template = views_get_view('get_article_titles');
+  $featured_nodes = array();
+
+  $result = '<div class="lwts-custom-page lwts-custom-page-topic">';
+
+  foreach ( $sub_topics as $topic ) {
+
+    $result .= '<div class="lwts-custom-page-row clearfix">';
+
+    // Display teaser view for top article in current topic.
+
+    $view = $teaser_view_template->clone_view();
+    $nids_to_exclude =
+      empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
+    $view_output = $view->preview( 'default', array(
+      'all', $topic->tid, $view_term_depth, $nids_to_exclude
+    ) );
+
+    $top_article_nid = NULL;
+
+    if ( !empty( $view->result ) ) {
+      $top_article_nid = $view->result[0]->nid;
+      $featured_nodes[] = $top_article_nid;
+      $knowledge_type =
+        _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
+
+      $result .=
+        '<div class="lwts-custom-page-view ' . $knowledge_type . '">';
+      $result .= $view_output;
+      $result .= '</div>'; //view
+    }
+
+    // Display titles view for top articles in current topic
+
+    $view = $titles_view_template->clone_view();
+    $result .= '<div class="lwts-custom-page-view">';
+    $result .= $view->preview( 'default', array(
+      'all', $topic->tid, $view_term_depth, $top_article_nid
     ) );
     $result .= '</div>'; //view
 

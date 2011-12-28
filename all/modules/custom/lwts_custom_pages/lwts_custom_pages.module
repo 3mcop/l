@@ -81,57 +81,7 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
 function _lwts_custom_pages_location_page( $location ) {
 
   drupal_set_title( $location->name );
-
-  $topics_vid = 3;
-  $top_level_topics = taxonomy_get_tree( $topics_vid, 0, 1 );
-  $view_term_depth = 10;
-  $teaser_view_template = views_get_view('get_one_article');
-  $titles_view_template = views_get_view('get_article_titles');
-  $featured_nodes = array();
-
-  $result = '<div class="lwts-custom-page lwts-custom-page-country">';
-
-  foreach ( $top_level_topics as $topic ) {
-
-    $result .= '<div class="lwts-custom-page-row clearfix">';
-
-    // Display teaser view for top article in current topic.
-
-    $view = $teaser_view_template->clone_view();
-    $nids_to_exclude =
-      empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
-    $view_output = $view->preview( 'default', array(
-      $location->tid, $topic->tid, $view_term_depth, $nids_to_exclude
-    ) );
-
-    $top_article_nid = NULL;
-
-    if ( !empty( $view->result ) ) {
-      $top_article_nid = $view->result[0]->nid;
-      $featured_nodes[] = $top_article_nid;
-      $knowledge_type =
-        _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
-
-      $result .=
-        '<div class="lwts-custom-page-view ' . $knowledge_type . '">';
-      $result .= $view_output;
-      $result .= '</div>'; //view
-    }
-
-    // Display titles view for top articles in current topic
-
-    $view = $titles_view_template->clone_view();
-    $result .= '<div class="lwts-custom-page-view">';
-    $result .= $view->preview( 'default', array(
-      $location->tid, $topic->tid, $view_term_depth, $top_article_nid
-    ) );
-    $result .= '</div>'; //view
-
-    $result .= '</div>'; // row
-  }
-  $result .= '</div>'; // page
-
-  return $result;
+  return _lwts_two_column_view_collection( NULL, $location );
 }
 
 /**
@@ -146,50 +96,93 @@ function _lwts_custom_pages_location_page( $location ) {
 function _lwts_custom_pages_topic_page( $topic ) {
 
   drupal_set_title( $topic->name );
+  return _lwts_two_column_view_collection( $topic );
+}
 
-  $sub_topics = taxonomy_get_tree( $topic->vid, $topic->tid, 1 );
-  $view_term_depth = 10;
+/**
+ * Get markup for a two column view of articles.
+ *
+ * @param $base_topic
+ *   The topic term for which sub-topics should be displayed, else NULL.
+ * @param $constraint_term
+ *   A constraining term with which all articles must be tagged, else NULL.
+ */
+function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term = NULL ) {
+
+  // Did callinf function supply a base topic?
+  if ( empty( $base_topic ) ) {
+    // Bit of a HACK - No base topic so use top level topics. Mock up a
+    // 'term' for the root of the Topic vocabulary.
+    $base_topic = new StdClass;
+    $base_topic->vid = 3;
+    $base_topic->tid = 0;
+  }
+
+  // Get the set of topics over which to iterate.
+  $topics = taxonomy_get_tree( $base_topic->vid, $base_topic->tid, 1 );
+
+  // Get the views used to display the articles. A new view will be cloned
+  // from these templates for each set of arguments.
   $teaser_view_template = views_get_view('get_one_article');
   $titles_view_template = views_get_view('get_article_titles');
+
+  // Get the input required for the views for the given constraining term.
+  $constraint =
+    !empty( $constraint_term ) ? $constraint_term->tid : 'all';
+
+  // Hard coded depth to descend topics for relevant articles.
+  $topic_depth = 10;
+
+  // Collect nodes already shown in teaser form so that we don't show the
+  // same one twice.
   $featured_nodes = array();
 
-  $result = '<div class="lwts-custom-page lwts-custom-page-topic">';
+  // Page markup starts with a wrapping div.
+  $label =
+    !empty( $constraint_term ) ? $constraint_term->name : $base_topic->name;
+  $result =
+    '<div class="lwts-custom-page lwts-custom-page-' . $label . '">';
 
-  foreach ( $sub_topics as $topic ) {
 
+  foreach ( $topics as $topic ) {
+
+    // Each two-view row starts with a wrapping div.
     $result .= '<div class="lwts-custom-page-row clearfix">';
 
-    // Display teaser view for top article in current topic.
-
+    // Get the teaser for the featured article for this topic
     $view = $teaser_view_template->clone_view();
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
     $view_output = $view->preview( 'default', array(
-      'all', $topic->tid, $view_term_depth, $nids_to_exclude
+      $constraint, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 
+    // Keep track of featured article so we don't show it in the second
+    // view for the current topic.
     $top_article_nid = NULL;
 
+    // Was an article found for display?
     if ( !empty( $view->result ) ) {
+
       $top_article_nid = $view->result[0]->nid;
       $featured_nodes[] = $top_article_nid;
+
+      // Show teaser wrapped in a div that identifies the Knowledge type.
       $knowledge_type =
         _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
-
       $result .=
-        '<div class="lwts-custom-page-view ' . $knowledge_type . '">';
+        '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
       $result .= $view_output;
       $result .= '</div>'; //view
     }
 
-    // Display titles view for top articles in current topic
-
+    // Show titles of other articles for the current topic.
     $view = $titles_view_template->clone_view();
-    $result .= '<div class="lwts-custom-page-view">';
+    $result .= '<div class="lwts-custom-page-view-pane">';
     $result .= $view->preview( 'default', array(
-      'all', $topic->tid, $view_term_depth, $top_article_nid
+      $constraint, $topic->tid, $topic_depth, $top_article_nid
     ) );
-    $result .= '</div>'; //view
+    $result .= '</div>'; // view-pane
 
     $result .= '</div>'; // row
   }
@@ -198,6 +191,15 @@ function _lwts_custom_pages_topic_page( $topic ) {
   return $result;
 }
 
+/**
+ * For the given node, determine the name of it's Kowledge type term.
+ *
+ * @param $node_id
+ *   The ID of the node for which to determine Knowledge type.
+ *
+ * @return
+ *   The name of the Knowledge type with which the given node is tagged.
+ */
 function _lwts_custom_pages_get_knowledge_type_css_class( $node_id ) {
   $node = node_load( $node_id );
   $lang = $node->language;

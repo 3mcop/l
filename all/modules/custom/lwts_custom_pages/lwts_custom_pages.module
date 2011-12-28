@@ -29,33 +29,47 @@ function lwts_custom_pages_menu() {
     'description' => 'See the latest articles from a specific location',
     'access callback' => TRUE,
     'page callback' => '_lwts_custom_pages_page_callback2',
+    'page arguments' => array( 1 ),
   );
 
   return $items;
 }
 
 
-function _lwts_custom_pages_page_callback2() {
+function _lwts_custom_pages_page_callback2( $location_name ) {
 
   $topics_vid = 3;
   $top_level_topics = taxonomy_get_tree( $topics_vid, 0, 1 );
   $view_term_depth = 10;
-  $view_template = views_get_view('get_top_article');
+  $view_template = views_get_view('get_one_article');
+  $featured_nodes = array();
 
-  $result = '<div class="views-set views-set-get-top-article">';
+  $result = '<div class="lwts-custom-page lwts-custom-page-country">';
 
   foreach ( $top_level_topics as $term ) {
-    $view = $view_template->clone_view();
-    $view_output = $view->preview('default', $term->tid, $view_term_depth );
-    $node_id = $view->result[0]->nid;
-    $knowledge_type =
-      _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
 
-    $result .= '<div class="' . $knowledge_type . '">';
-    $result .= $view_output;
-    $result .= '</div>';
+    $result .= '<div class="lwts-custom-page-row clearfix">';
+
+    $view = $view_template->clone_view();
+    $nids_to_exclude =
+      empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
+    $view_output = $view->preview( 'default', array(
+      $location_name, $term->tid, $view_term_depth, $nids_to_exclude
+    ) );
+
+    if ( !empty( $view->result ) ) {
+      $node_id = $view->result[0]->nid;
+      $featured_nodes[] = $node_id;
+      $knowledge_type =
+        _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
+
+      $result .= '<div class="' . $knowledge_type . '">';
+      $result .= $view_output;
+      $result .= '</div>'; //view
+    }
+    $result .= '</div>'; // row
   }
-  $result .= '</div>';
+  $result .= '</div>'; // page
 
   return $result;
 }

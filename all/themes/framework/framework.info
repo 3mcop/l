@@ -3,6 +3,7 @@ description = Framework is a blank canvas for theme developers. Use Framework as
 core = 7.x
 engine = phptemplate
 stylesheets[all][] = style.css
+stylesheets[all][] = lwts.css
 
 regions[header]         = Header
 regions[navigation]     = Navigation

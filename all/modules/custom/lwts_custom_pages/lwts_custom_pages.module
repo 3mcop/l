@@ -38,35 +38,54 @@ function lwts_custom_pages_menu() {
 
 function _lwts_custom_pages_page_callback2( $location_name ) {
 
+  $location = array_pop( taxonomy_get_term_by_name( $location_name ) );
+  drupal_set_title( $location->name );
+
   $topics_vid = 3;
   $top_level_topics = taxonomy_get_tree( $topics_vid, 0, 1 );
   $view_term_depth = 10;
-  $view_template = views_get_view('get_one_article');
+  $teaser_view_template = views_get_view('get_one_article');
+  $titles_view_template = views_get_view('get_article_titles');
   $featured_nodes = array();
 
   $result = '<div class="lwts-custom-page lwts-custom-page-country">';
 
-  foreach ( $top_level_topics as $term ) {
+  foreach ( $top_level_topics as $topic ) {
 
     $result .= '<div class="lwts-custom-page-row clearfix">';
 
-    $view = $view_template->clone_view();
+    // Display teaser view for top article in current topic.
+
+    $view = $teaser_view_template->clone_view();
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
     $view_output = $view->preview( 'default', array(
-      $location_name, $term->tid, $view_term_depth, $nids_to_exclude
+      $location->tid, $topic->tid, $view_term_depth, $nids_to_exclude
     ) );
 
-    if ( !empty( $view->result ) ) {
-      $node_id = $view->result[0]->nid;
-      $featured_nodes[] = $node_id;
-      $knowledge_type =
-        _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
+    $top_article_nid = NULL;
 
-      $result .= '<div class="' . $knowledge_type . '">';
+    if ( !empty( $view->result ) ) {
+      $top_article_nid = $view->result[0]->nid;
+      $featured_nodes[] = $top_article_nid;
+      $knowledge_type =
+        _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
+
+      $result .=
+        '<div class="lwts-custom-page-view ' . $knowledge_type . '">';
       $result .= $view_output;
       $result .= '</div>'; //view
     }
+
+    // Display titles view for top articles in current topic
+
+    $view = $titles_view_template->clone_view();
+    $result .= '<div class="lwts-custom-page-view">';
+    $result .= $view->preview( 'default', array(
+      $location->tid, $topic->tid, $view_term_depth, $top_article_nid
+    ) );
+    $result .= '</div>'; //view
+
     $result .= '</div>'; // row
   }
   $result .= '</div>'; // page

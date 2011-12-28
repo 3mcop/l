@@ -1,0 +1,4 @@
+name = "LWtS custom blocks"
+description = "Blocks specific to LWtS"
+package = Live With the Sea
+core = 7.x

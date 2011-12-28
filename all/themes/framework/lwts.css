@@ -12,3 +12,12 @@
   float: left;
   margin-left: 30px;
 }
+
+/* For the content of the topic nav block */
+#block-lwts-custom-blocks-topic-nav .taxonomy-branch {
+  float: left;
+  font-size: 73%;
+}
+#block-lwts-custom-blocks-topic-nav .empty {
+  padding-left: 7.5em;
+}

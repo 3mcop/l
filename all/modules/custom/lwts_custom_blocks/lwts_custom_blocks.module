@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Custom blocks for the Live With the Sea website.
+ */
+
+function lwts_custom_blocks_block_info() {
+
+  $blocks['topic-nav'] = array (
+    'info' => 'LWtS Topic navigation',
+  );
+
+  return $blocks;
+}
+
+function lwts_custom_blocks_block_view( $delta = '' ) {
+
+  switch ( $delta ) {
+  case 'topic-nav' :
+    $block['content'] = _lwts_custom_blocks_topic_nav_content();
+    return $block;
+  }
+}
+
+function _lwts_custom_blocks_topic_nav_content() {
+
+  // HACK - hard coded relevant vocabulary id.
+  $topics_vid = 3;
+  $top_level_terms = taxonomy_get_tree( $topics_vid, 0, 1 );
+  $first = TRUE;
+  $result = '';
+
+  foreach ( $top_level_terms as $top_level_term ) {
+
+    $result .= '<div class="taxonomy-branch">';
+    $result .= '<div class="top-level-topic">';
+    $result .=
+      l( $top_level_term->name, 'taxonomy/term/' . $top_level_term->tid );
+    $result .= '</div>';
+
+    $sub_terms = taxonomy_get_tree(
+      $top_level_term->vid, $top_level_term->tid, NULL );
+
+    if ( empty( $sub_terms ) ) {
+      $result .= '<ul class="empty">';
+    }
+    else {
+      $result .= '<ul>';
+      foreach ( $sub_terms as $sub_term ) {
+        $result .= '<li>' . 
+          l( $sub_term->name, 'taxonomy/term/' . $sub_term->tid )
+          . '</li>';
+      }
+    }
+
+    $result .= '</ul></div>';
+  }
+  return $result;
+}
+
+

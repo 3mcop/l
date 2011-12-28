@@ -23,48 +23,63 @@ function lwts_custom_pages_menu() {
     'page callback' => '_lwts_custom_pages_page_callback',
   );
 
-  // Country page
-  // Wildcard is the name of taxonomy term from the Location vocabulary.
-  $items['origin/%'] = array (
-    'title' => 'origin',
-    'description' => 'See the latest articles from a specific location',
-    'access callback' => TRUE,
-    'page callback' => '_lwts_custom_pages_country_page',
-    'page arguments' => array( 1 ),
-  );
-
-  // Topic page
-  // Wildcard is the name of taxonomy term from the Topic vocabulary.
-  $items['topic/%'] = array (
-    'title' => 'Topic',
-    'description' => 'See the latest articles for a given topic',
-    'access callback' => TRUE,
-    'page callback' => '_lwts_custom_pages_topic_page',
-    'page arguments' => array( 1 ),
-  );
-
   return $items;
 }
 
-function _lwts_get_term_from_name( $term_name ) {
-  
-  $terms = taxonomy_get_term_by_name( $term_name );
+/**
+ * Implements hook_menu_alter()
+ *
+ * Overriding default taxonomy term pages.
+ * See _lwts_custom_pages_taxonomy_term_page()
+ */
+function lwts_custom_pages_menu_alter( &$menu ) {
 
-  if ( empty( $terms ) ) {
-    $term_name = str_replace( '-', ' ', $term_name );
-  }
+  $menu['taxonomy/term/%taxonomy_term']['page callback'] =
+    '_lwts_custom_pages_taxonomy_term_page';
+  unset( $menu['taxonomy/term/%taxonomy_term']['file'] );
+  $menu['taxonomy/term/%taxonomy_term']['module'] = 'lwts_custom_pages';
 
-  $terms = taxonomy_get_term_by_name( $term_name );
-
-  return empty( $terms ) ? NULL : array_pop( $terms );
+  return $menu;
 }
 
-function _lwts_custom_pages_country_page( $location_name ) {
+/**
+ * Page callback for taxonomy pages.
+ *
+ * Diverting requests for terms from some vocabularies to custom pages.
+ *
+ * @param $term
+ *   The term object for the requested taxonomy term.
+ *
+ * @return
+ *   String containing the page markup.
+ */
+function _lwts_custom_pages_taxonomy_term_page( $term ) {
 
-  $location = _lwts_get_term_from_name( $location_name );
-  if ( ! $location ) {
-    return MENU_NOT_FOUND;
+  $vocabulary = taxonomy_vocabulary_load($term->vid);
+
+  switch( $vocabulary->name ) {
+  case 'Topic':
+    return _lwts_custom_pages_topic_page( $term );
+  case 'Location':
+    return _lwts_custom_pages_location_page( $term );
+  default:
+    // Returns the default term page provided by taxonomy module.
+    module_load_include('inc', 'taxonomy', 'taxonomy.pages');
+    return taxonomy_term_page($tid);
   }
+}
+
+/**
+ * Page callback for Location vocabulary terms.
+ *
+ * @param $location
+ *   The term object for the requested location.
+ *
+ * @return
+ *   String containing the page markup.
+ */
+function _lwts_custom_pages_location_page( $location ) {
+
   drupal_set_title( $location->name );
 
   $topics_vid = 3;
@@ -119,12 +134,17 @@ function _lwts_custom_pages_country_page( $location_name ) {
   return $result;
 }
 
-function _lwts_custom_pages_topic_page( $topic_name ) {
+/**
+ * Page callback for Topic vocabulary terms.
+ *
+ * @param $term
+ *   The term object for the requested topic.
+ *
+ * @return
+ *   String containing the page markup.
+ */
+function _lwts_custom_pages_topic_page( $topic ) {
 
-  $topic = _lwts_get_term_from_name( $topic_name );
-  if ( ! $topic ) {
-    return MENU_NOT_FOUND;
-  }
   drupal_set_title( $topic->name );
 
   $sub_topics = taxonomy_get_tree( $topic->vid, $topic->tid, 1 );
@@ -177,7 +197,6 @@ function _lwts_custom_pages_topic_page( $topic_name ) {
 
   return $result;
 }
-
 
 function _lwts_custom_pages_get_knowledge_type_css_class( $node_id ) {
   $node = node_load( $node_id );

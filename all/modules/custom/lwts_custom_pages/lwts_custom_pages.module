@@ -59,53 +59,27 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
 
   switch( $vocabulary->name ) {
   case 'Topic':
-    return _lwts_custom_pages_topic_page( $term );
+    drupal_set_title( $term->name );
+    return _lwts_two_column_view_collection( $term, NULL );
   case 'Location':
-    return _lwts_custom_pages_location_page( $term );
+    drupal_set_title( $term->name );
+    return _lwts_two_column_view_collection( NULL, $term );
   default:
     // Returns the default term page provided by taxonomy module.
     module_load_include('inc', 'taxonomy', 'taxonomy.pages');
-    return taxonomy_term_page($tid);
+    return taxonomy_term_page( $term );
   }
-}
-
-/**
- * Page callback for Location vocabulary terms.
- *
- * @param $location
- *   The term object for the requested location.
- *
- * @return
- *   String containing the page markup.
- */
-function _lwts_custom_pages_location_page( $location ) {
-
-  drupal_set_title( $location->name );
-  return _lwts_two_column_view_collection( NULL, $location );
-}
-
-/**
- * Page callback for Topic vocabulary terms.
- *
- * @param $term
- *   The term object for the requested topic.
- *
- * @return
- *   String containing the page markup.
- */
-function _lwts_custom_pages_topic_page( $topic ) {
-
-  drupal_set_title( $topic->name );
-  return _lwts_two_column_view_collection( $topic );
 }
 
 /**
  * Get markup for a two column view of articles.
  *
  * @param $base_topic
- *   The topic term for which sub-topics should be displayed, else NULL.
+ *   The topic term for which sub-topics should be displayed.
+ *   The vocabulary root will be used if this argument is NULL.
  * @param $constraint_term
- *   A constraining term with which all articles must be tagged, else NULL.
+ *   A constraining term with which all articles must be tagged.
+ *   No constraining term is used when this argument is NULL.
  */
 function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term = NULL ) {
 

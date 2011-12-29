@@ -163,7 +163,7 @@ function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term 
       $result .= '</div>'; // view-pane
     }
 
-    $result .= '</div>'; // row
+    $result .= '</div></div>'; // inner and outer rows
   }
   $result .= '</div>'; // page
 

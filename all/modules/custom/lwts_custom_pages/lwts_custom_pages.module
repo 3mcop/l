@@ -121,7 +121,7 @@ function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term 
   foreach ( $topics as $topic ) {
 
     // Each two-view row starts with a wrapping div.
-    $result .= '<div class="lwts-custom-page-row clearfix">';
+    $result .= '<div class="lwts-custom-page-row-outer clearfix">';
 
     // Get the teaser for the featured article for this topic
     $view = $teaser_view_template->clone_view();
@@ -140,6 +140,11 @@ function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term 
 
       $top_article_nid = $view->result[0]->nid;
       $featured_nodes[] = $top_article_nid;
+
+      $result .= '<h3>' . $topic->name . '</h3>';
+
+      // Inner row div to separate heading from view panes. 
+      $result .= '<div class="lwts-custom-page-row-inner clearfix">';
 
       // Show teaser wrapped in a div that identifies the Knowledge type.
       $knowledge_type =

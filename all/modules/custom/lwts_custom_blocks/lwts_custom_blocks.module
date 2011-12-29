@@ -33,28 +33,36 @@ function _lwts_custom_blocks_topic_nav_content() {
 
   foreach ( $top_level_terms as $top_level_term ) {
 
-    $result .= '<div class="taxonomy-branch">';
+    if ( $first ) {
+      $result .= '<div class="taxonomy-branch first">';
+      $first = FALSE;
+    }
+    else {
+      $result .= '<div class="taxonomy-branch">';
+    }
+
     $result .= '<div class="top-level-topic">';
     $result .=
       l( $top_level_term->name, 'taxonomy/term/' . $top_level_term->tid );
-    $result .= '</div>';
+    $result .= '</div><br/>';
 
     $sub_terms = taxonomy_get_tree(
       $top_level_term->vid, $top_level_term->tid, NULL );
 
     if ( empty( $sub_terms ) ) {
-      $result .= '<ul class="empty">';
+      $result .= '<div class="sub-topics empty"></div>';
     }
     else {
-      $result .= '<ul>';
+      $result .= '<div class="sub-topics"/>';
       foreach ( $sub_terms as $sub_term ) {
-        $result .= '<li>' . 
-          l( $sub_term->name, 'taxonomy/term/' . $sub_term->tid )
-          . '</li>';
+        $result .= '<div class="sub-topic"/>' .
+          l( $sub_term->name, 'taxonomy/term/' . $sub_term->tid ) .
+          '</div>';
       }
+      $result .= '</div>';
     }
 
-    $result .= '</ul></div>';
+    $result .= '</div>';
   }
   return $result;
 }

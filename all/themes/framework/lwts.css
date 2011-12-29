@@ -21,8 +21,9 @@
 /* For the content of the topic nav block */
 #block-lwts-custom-blocks-topic-nav .taxonomy-branch {
   float: left;
-  font-size: 73%;
+  font-size: 75%;
+  margin-left: 2.5em;
 }
-#block-lwts-custom-blocks-topic-nav .empty {
-  padding-left: 7.5em;
+#block-lwts-custom-blocks-topic-nav .first {
+  margin-left: 0;
 }

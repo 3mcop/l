@@ -71,13 +71,13 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
     else {
       // The given topic has sub-topics.
       // Show summary for each sub-topic.
-      return _lwts_custom_pages_topic_set_page( $term, NULL );
+      return _lets_custom_pages_sibling_topics_page( $term, NULL );
     }
 
 //  case 2 : // Knowledge type
   case 4 : // Location
     drupal_set_title( $term->name );
-    return _lwts_custom_pages_topic_set_page( NULL, $term );
+    return _lets_custom_pages_sibling_topics_page( NULL, $term );
 
   default:
     // Returns the default term page provided by taxonomy module.
@@ -97,7 +97,6 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
  */
 function _lwts_custom_pages_leaf_topic_page( $topic ) {
 
-
   $teaser_view_template = views_get_view('get_one_article');
 
   // Collect nodes already shown in teaser form so that we don't show the
@@ -111,10 +110,12 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $max_rows = 5;
   $action_tid = 2;
   $education_tid = 1;
+  $topic_depth = 10; // Irrelevant to leaf topics. Included for readability.
 
   for ( $i = 0; $i < $max_rows; $i++ ) {
 
-    // Clone the action and education views and set their offsets. 
+    // Clone the action and education views and set their offsets.
+    unset( $views );
     $views = array();
     $views[0] = $teaser_view_template->clone_view();
     $views[0]->display['default']->display_options['pager']['options']['offset'] = $i;
@@ -124,6 +125,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
 
+    unset( $views_output );
     $views_output = array();
     $views_output[0] = $views[0]->preview( 'default', array(
       $action_tid, $topic->tid, $topic_depth, $nids_to_exclude
@@ -131,7 +133,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     $views_output[1] = $views[1]->preview( 'default', array(
       $education_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
-
+dsm( $views );
     // Were no nodes found for display?
     if ( empty( $views[0]->result ) && empty( $views[1]->result ) ) {
       // No more rows to display.
@@ -145,15 +147,16 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
 
       if ( empty( $views[$j]->result[0] ) ) {
         // No results - Output an empty div to allow proper spacing.
-        $result .= '<div class="lwts-custom-page-view-pane empty"></br></br></br></br></br></br></br></br></br></div>';
+        $result .= '<div class="lwts-custom-page-view-pane empty"></br></div>';
       }
       else {
 
-        $featured_nodes[] = $views[$j]->result[0]->nid;
+        $node_id = $views[$j]->result[0]->nid;
+        $featured_nodes[] = $node_id;
 
         // Show teaser wrapped in a div that identifies the Knowledge type.
         $knowledge_type =
-          _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
+          _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
         $result .=
           '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
         $result .= $views_output[$j];
@@ -178,7 +181,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
  *   A constraining term with which all articles must be tagged.
  *   No constraining term is used when this argument is NULL.
  */
-function _lwts_custom_pages_topic_set_page( $base_topic = NULL, $constraint_term = NULL ) {
+function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint_term = NULL ) {
 
   // Did calling function supply a base topic?
   if ( empty( $base_topic ) ) {

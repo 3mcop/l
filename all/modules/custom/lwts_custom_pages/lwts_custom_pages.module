@@ -133,7 +133,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     $views_output[1] = $views[1]->preview( 'default', array(
       $education_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
-dsm( $views );
+
     // Were no nodes found for display?
     if ( empty( $views[0]->result ) && empty( $views[1]->result ) ) {
       // No more rows to display.

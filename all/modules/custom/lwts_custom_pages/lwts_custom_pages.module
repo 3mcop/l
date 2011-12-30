@@ -103,10 +103,6 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
 
   $teaser_view_template = views_get_view('get_one_article');
 
-  // Collect nodes already shown in teaser form so that we don't show the
-  // same one twice.
-  $featured_nodes = array();
-
   $result = '<div class="lwts-custom-page lwts-custom-page-' .
     _to_css( $topic->name ) . '">';
 
@@ -119,9 +115,10 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $topic_depth = 0;
   $nids_to_exclude = NULL;
 
+  // Iterate over the rows to display. (May terminate early.)
   for ( $i = 0; $i < $max_rows; $i++ ) {
 
-    // Clone the action and education views and set their offsets.
+    // Clone the action and education views and set their pager offsets.
     unset( $views );
     $views = array();
     $views[0] = $teaser_view_template->clone_view();
@@ -129,6 +126,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     $views[1] = $teaser_view_template->clone_view();
     $views[1]->display['default']->display_options['pager']['options']['offset'] = $i;
 
+    // "Preview" the views, calculating their results in the process.
     unset( $views_output );
     $views_output = array();
     $views_output[0] = $views[0]->preview( 'default', array(
@@ -147,27 +145,27 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     // Each two-view row starts with a wrapping div.
     $result .= '<div class="lwts-custom-page-row-outer clearfix">';
 
+    // Iterate over the two previewed views.
     for ( $j = 0; $j < 2;  $j++ ) {
 
-      if ( empty( $views[$j]->result[0] ) ) {
-        // No results - Output an empty div to allow proper spacing.
-        $result .= '<div class="lwts-custom-page-view-pane empty"></br></div>';
-      }
-      else {
+      // Does the current view have a result?
+      if ( !empty( $views[$j]->result[0] ) ) {
 
+        // Show teaser result wrapped in a div identifying the Knowledge type.
         $node_id = $views[$j]->result[0]->nid;
-        $featured_nodes[] = $node_id;
-
-        // Show teaser wrapped in a div that identifies the Knowledge type.
         $knowledge_type =
           _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
         $result .=
           '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
         $result .= $views_output[$j];
-        $result .= '</div>'; // view-pane
+        $result .= '</div>';
+      }
+      else { // no result
+
+        // Output an empty div to allow proper spacing.
+        $result .= '<div class="lwts-custom-page-view-pane empty"></br></div>';
       }
     }
-
     $result .= '</div>'; // outer row
   }
   $result .= '</div>'; // page

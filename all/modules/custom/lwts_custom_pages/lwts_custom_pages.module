@@ -86,6 +86,10 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
   }
 }
 
+function _to_css( $text ) {
+  return strtolower( str_replace( ' ', '-', $text ) );
+}
+
 /**
  * Show latest articles for given topic.
  *
@@ -103,8 +107,8 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   // same one twice.
   $featured_nodes = array();
 
-  $result =
-    '<div class="lwts-custom-page lwts-custom-page-' . $topic->name . '">';
+  $result = '<div class="lwts-custom-page lwts-custom-page-' .
+    _to_css( $topic->name ) . '">';
 
   // HACK - hard-coded
   $max_rows = 5;
@@ -212,8 +216,8 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
   $featured_nodes = array();
 
   // Page markup starts with a wrapping div.
-  $label =
-    !empty( $constraint_term ) ? $constraint_term->name : $base_topic->name;
+  $label = _to_css(
+    !empty( $constraint_term ) ? $constraint_term->name : $base_topic->name );
   $result =
     '<div class="lwts-custom-page lwts-custom-page-' . $label . '">';
 

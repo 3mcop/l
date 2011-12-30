@@ -55,20 +55,117 @@ function lwts_custom_pages_menu_alter( &$menu ) {
  */
 function _lwts_custom_pages_taxonomy_term_page( $term ) {
 
-  $vocabulary = taxonomy_vocabulary_load($term->vid);
+  switch( $term->vid ) {
 
-  switch( $vocabulary->name ) {
-  case 'Topic':
+  case 3 : // Topic
     drupal_set_title( $term->name );
-    return _lwts_two_column_view_collection( $term, NULL );
-  case 'Location':
+
+    // Get sub-topics of the current term.
+    $topics = taxonomy_get_tree( $term->vid, $term->tid, 1 );
+
+    if ( empty( $topics ) ) {
+      // The given topic has no sub-topics.
+      // Display page appropriate to a leaf topic.
+      return _lwts_custom_pages_leaf_topic_page( $term );
+    }
+    else {
+      // The given topic has sub-topics.
+      // Show summary for each sub-topic.
+      return _lwts_custom_pages_topic_set_page( $term, NULL );
+    }
+
+//  case 2 : // Knowledge type
+  case 4 : // Location
     drupal_set_title( $term->name );
-    return _lwts_two_column_view_collection( NULL, $term );
+    return _lwts_custom_pages_topic_set_page( NULL, $term );
+
   default:
     // Returns the default term page provided by taxonomy module.
     module_load_include('inc', 'taxonomy', 'taxonomy.pages');
     return taxonomy_term_page( $term );
   }
+}
+
+/**
+ * Show latest articles for given topic.
+ *
+ * @param $topic
+ *   The $topic for which to display nodes.
+ *
+ * @return
+ *   Markup for the custom page.
+ */
+function _lwts_custom_pages_leaf_topic_page( $topic ) {
+
+
+  $teaser_view_template = views_get_view('get_one_article');
+
+  // Collect nodes already shown in teaser form so that we don't show the
+  // same one twice.
+  $featured_nodes = array();
+
+  $result =
+    '<div class="lwts-custom-page lwts-custom-page-' . $topic->name . '">';
+
+  // HACK - hard-coded
+  $max_rows = 5;
+  $action_tid = 2;
+  $education_tid = 1;
+
+  for ( $i = 0; $i < $max_rows; $i++ ) {
+
+    // Clone the action and education views and set their offsets. 
+    $views = array();
+    $views[0] = $teaser_view_template->clone_view();
+    $views[0]->display['default']->display_options['pager']['options']['offset'] = $i;
+    $views[1] = $teaser_view_template->clone_view();
+    $views[1]->display['default']->display_options['pager']['options']['offset'] = $i;
+
+    $nids_to_exclude =
+      empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
+
+    $views_output = array();
+    $views_output[0] = $views[0]->preview( 'default', array(
+      $action_tid, $topic->tid, $topic_depth, $nids_to_exclude
+    ) );
+    $views_output[1] = $views[1]->preview( 'default', array(
+      $education_tid, $topic->tid, $topic_depth, $nids_to_exclude
+    ) );
+
+    // Were no nodes found for display?
+    if ( empty( $views[0]->result ) && empty( $views[1]->result ) ) {
+      // No more rows to display.
+      break;
+    }
+
+    // Each two-view row starts with a wrapping div.
+    $result .= '<div class="lwts-custom-page-row-outer clearfix">';
+
+    for ( $j = 0; $j < 2;  $j++ ) {
+
+      if ( empty( $views[$j]->result[0] ) ) {
+        // No results - Output an empty div to allow proper spacing.
+        $result .= '<div class="lwts-custom-page-view-pane empty"></br></br></br></br></br></br></br></br></br></div>';
+      }
+      else {
+
+        $featured_nodes[] = $views[$j]->result[0]->nid;
+
+        // Show teaser wrapped in a div that identifies the Knowledge type.
+        $knowledge_type =
+          _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
+        $result .=
+          '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
+        $result .= $views_output[$j];
+        $result .= '</div>'; // view-pane
+      }
+    }
+
+    $result .= '</div>'; // outer row
+  }
+  $result .= '</div>'; // page
+
+  return $result;
 }
 
 /**
@@ -81,9 +178,9 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
  *   A constraining term with which all articles must be tagged.
  *   No constraining term is used when this argument is NULL.
  */
-function _lwts_two_column_view_collection( $base_topic = NULL, $constraint_term = NULL ) {
+function _lwts_custom_pages_topic_set_page( $base_topic = NULL, $constraint_term = NULL ) {
 
-  // Did callinf function supply a base topic?
+  // Did calling function supply a base topic?
   if ( empty( $base_topic ) ) {
     // Bit of a HACK - No base topic so use top level topics. Mock up a
     // 'term' for the root of the Topic vocabulary.

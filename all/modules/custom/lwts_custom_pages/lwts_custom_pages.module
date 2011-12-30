@@ -114,7 +114,10 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $max_rows = 5;
   $action_tid = 2;
   $education_tid = 1;
-  $topic_depth = 10; // Irrelevant to leaf topics. Included for readability.
+
+  // Irrelevant in the context of this function. Included for readability.
+  $topic_depth = 0;
+  $nids_to_exclude = NULL;
 
   for ( $i = 0; $i < $max_rows; $i++ ) {
 
@@ -125,9 +128,6 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     $views[0]->display['default']->display_options['pager']['options']['offset'] = $i;
     $views[1] = $teaser_view_template->clone_view();
     $views[1]->display['default']->display_options['pager']['options']['offset'] = $i;
-
-    $nids_to_exclude =
-      empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
 
     unset( $views_output );
     $views_output = array();

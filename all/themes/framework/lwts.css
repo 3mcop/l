@@ -1,9 +1,14 @@
 
 /* For two-column custom pages */
-.lwts-custom-page-view-pane {
+.lwts-custom-page-view-pane,
+.lwts-custom-page-view-pane-outer {
   float: left;
   width: 48%;
   padding: 0 0.5em;
+}
+
+.columns-3 {
+  width: 31.5%;
 }
 
 /* For blocks in the header region */

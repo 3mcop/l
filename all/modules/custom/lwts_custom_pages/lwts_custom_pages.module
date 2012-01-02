@@ -20,8 +20,16 @@ function lwts_custom_pages_menu() {
     'title' => 'Home',
     'description' => 'See the latest from Live with the Sea',
     'access callback' => TRUE,
-    'page callback' => '_lwts_custom_pages_page_callback',
+    'page callback' => '_lwts_custom_pages_home_page',
   );
+
+  //// Home page
+  //$items['home-page-old'] = array (
+  //  'title' => 'Home',
+  //  'description' => 'See the latest from Live with the Sea',
+  //  'access callback' => TRUE,
+  //  'page callback' => '_lwts_custom_pages_page_callback',
+  //);
 
   return $items;
 }
@@ -287,410 +295,511 @@ function _lwts_custom_pages_get_knowledge_type_css_class( $node_id ) {
   $tid = $node->field_knowledge_type[$lang][0]['tid'];
 
   // ULTRA HACK - fragile - change to vocabulary will break this.
-  $css_class = ( $tid == 1 ? 'Education' : 'Action' );
+  $css_class = ( $tid == 1 ? 'education' : 'action' );
 
   return $css_class;
 }
 
 /**
- * Page callback for the home page.
+ * Embedded views home page.
  */
-function _lwts_custom_pages_page_callback() {
+function _lwts_custom_pages_home_page() {
 
-  $page_id = arg(0);
-  $required_term_name = arg(1);
-  $config = _lwts_custom_pages_get_page_config( $page_id );
-  if ( !empty( $required_term_name ) ) {
-    $required_term = array_pop( taxonomy_get_term_by_name( arg(1)) );
-    //dsm( $required_term);
-    drupal_set_title( $required_term->name );
-  }
-  else {
-    $required_term = NULL;
-  }
+  $result = '<div class="lwts-custom-pages-home-page">';
 
-  // Get the terms for each node that is tagged with a term from the
-  // relevant vocabularies.
-  $node_terms = _lwts_custom_pages_get_node_terms(
-    $config->sort_property,
-    $config->is_sticky_applies,
-    $config->vids,
-    empty($required_term) ? NULL : $required_term->tid
-  );
-  //dsm( $node_terms );
+  $knowledge_type_vid = 2;
+  list( $output, $nodes ) = _lwts_custom_pages_get_top_level_vocab_teasers(
+    $knowledge_type_vid, array(), 2 );
+  $result .= $output;
 
-  $result =
-    '<div class="lwts-custom-page lwts-custom-page-' . $page_id . '">';
+  $topic_vid = 3;
+  list( $output, $nodes ) =
+    _lwts_custom_pages_get_top_level_vocab_teasers( $topic_vid, $nodes, 3 );
+  $result .= $output;
 
-  foreach ( $config->vids as $vid ) {
-    $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
-    //dsm( $tree );
-    $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
-    //dsm( $top_level_terms );
+  $result .= '</div>';
 
-    $nodes_to_display = _lwts_custom_pages_get_nodes_to_display(
-      &$node_terms, $top_level_terms );
-    //dsm( $nodes_to_display );
+  return $result;
+}
 
-    $class = 'vocabulary-' . $vid;
-    $num_cols = min( count( $top_level_terms ), $config->max_cols );
-    drupal_add_css( _lwts_custom_pages_get_css( $class, $num_cols ),
-      array( 'type' => 'inline' ) );
+function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_exclude, $max_cols ) {
 
-    $result .= '<div class="vocabulary ' . $class . ' clearfix">';
-    $result .= '<div class="lwts-custom-page-row clearfix">';
-    $index = 1;
-    foreach ( $nodes_to_display as $term_id => $node ) {
+  $result = '<div class="lwts-custom-page-vocabulary ' .
+    'lwts-custom-page-vocabulary-' . $vocab_id . ' clearfix">';
 
-      // HALF A HACK - Hard coded term names - it does stop a renamed
-      // taxonomy from spoiling the CSS.
-      $classes = in_array( 1, $node['terms'] ) ? 'Education' : 'Action';
+  $view_template = views_get_view('get_one_article');
+  $terms = taxonomy_get_tree( $vocab_id, 0, 1 );
+  $num_cols = min( count( $terms ), $max_cols );
+  $index = 1;
+  $topic_depth = 10;
 
-      $result .= _lwts_custom_pages_get_rendered_node(
-        $term_id, $node['nid'], 'teaser', $classes );
+  foreach( $terms as $term ) {
 
-      // Was this the last node in the row?
+    // Is this the first column in the row?
+    if ( $index % $num_cols == 1 ) {
+      // Open row
+      $result .= '<div class="lwts-custom-page-row clearfix">';
+    }
+
+    unset( $view );
+    $view = $view_template->clone_view();
+    $exclude =
+      empty( $nodes_to_exclude ) ? NULL : implode( $nodes_to_exclude, '+' );
+
+    if ( $vocab_id == 3 ) {
+      $output = $view->preview( 'default', array(
+            'all', $term->tid, $topic_depth, $exclude
+            ) );
+    }
+    else {
+      $output = $view->preview( 'default', array(
+            $term->tid, 'all', $topic_depth, $exclude
+            ) );
+    }
+
+    if ( !empty( $view->result ) ) {
+
+      $node_id = $view->result[0]->nid;
+      $nodes_to_exclude[] = $node_id;
+      $knowledge_type =
+        _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
+
+      $result .= '<div class="lwts-custom-page-view-pane-outer columns-'
+        . $num_cols .'">';
+      $result .= '<h3>' . $term->name . '</h3>';
+      $result .= '<div class="lwts-custom-page-view-pane-inner '
+        . $knowledge_type . '">';
+      $result .= $output; 
+      $result .= '</div></div>';
+
+      // Is this the last column in the row?
       if ( ( $index % $num_cols ) == 0 ) {
-        $result .= '</div><div class="lwts-custom-page-row clearfix">';
-      }
-      $index++;
-    }
-    $result .= '</div></div>';
-  }
-  $result .= '</div>';
-
-  return $result;
-}
-
-function _lwts_custom_pages_get_required_term( $term_name ) {
-}
-
-function _lwts_custom_pages_get_page_config( $page_id ) {
-
-  // HACK// HACK// HACK// HACK// HACK// HACK      // HACK!!!!!!
-  // Replace switch with variable_get() calls and per-page config pages.
-
-  $result = new StdClass;
-
-  switch ( $page_id ) {
-  case 'home-page' :
-    $result->sort_property = 'created';
-    $result->is_sticky_applies = TRUE;
-    $result->vids = array( 2, 3 );
-    $result->max_cols = 3;
-    break;
-  case 'origin' :
-    $result->sort_property = 'created';
-    $result->is_sticky_applies = TRUE;
-    $result->vids = array( 2, 3 );
-    $result->max_cols = 3;
-    break;
-  }
-  return $result;
-}
-
-/**
- * Get data from nodes tagged with terms from a given set of vocabularies.
- *
- * @todo genericise more - sorting currently restricted to a colum in the
- * node table, which won't work for user ratings or most visited.
- *
- * @param $sort_property_column string
- *   The name of a column in the node table on which to sort
- * @param $is_sticky_applies boolean
- *   Should sticky nodes come at the top of the list?
- * @param $vids array( integer )
- *   The set of vocabulary ids that should be considered.
- * @param $max_nodes integer
- *   The maximum number of nodes to load.
- * @param $required_tid
- *   The ID of the term that returned nodes must be tagged with, else NULL.
- *
- * @return
- *   array( node_id => array(  ) )
- */
-function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids, $required_tid ) {
-
-  // Tables required:
-  // node - nid ( + sort_property )
-  // taxonomy_vocabulary - name
-  // taxonomy_term_data - to connect vocab to terms
-  // taxonomy_index - for node-term join
-  //
-  $query = db_select( 'node', 'n' );
-  $query->join( 'taxonomy_index', 'ti', 'ti.nid = n.nid' );
-  $query->join( 'taxonomy_term_data', 'ttd', 'ttd.tid = ti.tid' );
-  $query->join( 'taxonomy_vocabulary', 'tv', 'tv.vid = ttd.vid' );
-  $query->addField( 'n', 'nid', 'node_id' );
-  $query->addField( 'ttd', 'tid', 'term_id' );
-  $query->condition( 'tv.vid', $vids, 'IN' );
-
-  if ( $is_sticky_applies ) {
-    $query->orderBy( 'n.sticky', 'DESC' );
-  }
-
-  $query->orderBy( 'n.' . $sort_property_column, 'DESC' );
-  $query->orderBy( 'ttd.weight', 'ASC' );
-
-  if ( !empty( $required_term ) ) {
-    $subquery = db_select( 'taxonomy_index', 'ti' );
-    $subquery->addField( 'ti', 'nid', 'node_id' );
-    $subquery->condition( 'ti.tid', $required_tid );
-    $query->condition( 'n.nid', $subquery, 'IN' );
-  }
-
-  $result_set =  $query->execute();
-  $rows = array();
-  while ( $row = $result_set->fetchAssoc() ) {
-    $rows[ $row['node_id'] ][ $row['term_id'] ] = $row['term_id'];
-  }
-
-  //if ( !empty( $required_term ) ) {
-  //  global $_lwts_custom_pages_required_term;
-  //  $_lwts_custom_pages_required_term = $required_term;
-  //  $rows = array_filter(
-  //    $rows, '_lwts_custom_pages_includes_required_term' );
-  //}
-  return $rows;
-}
-
-/**
- * Do the given terms include the (global) required term?
- *
- * Callback fn for array_filter.
- * Helper fn for _lwts_custom_pages_get_node_terms
- *
- * @param $terms
- *   An array of term IDs
- *
- * @return
- *   TRUE if the required term is present, else FALSE;
- */
-function _lwts_custom_pages_includes_required_term( $terms ) {
-  global $_lwts_custom_pages_required_term;
-  return in_array( $_lwts_custom_pages_required_term, $terms );
-}
-
-/**
- * Get the term IDs of a vocabulary keyed by root terms.
- *
- * @param $vid integer
- *   The ID of the required vocabulary
- *
- * @return
- *   array( top_level_tid => array( child_ID ) )
- */
-function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
-
-  $terms = taxonomy_get_tree( $vid );
-  $branches = array();
-
-  // Collect terms according to parentage
-  foreach ( $terms as $term ) {
-    $tid = $term->tid;
-    $parent = $term->parents[0];  // HACK - Assumes single parent!
-
-    if ( empty($branches[$parent]) ) {
-      $branches[$parent] = array();
-      $branches[$parent]['tid'] = $parent;
-      $branches[$parent]['children'] = array();
-    }
-    $branches[$parent]['children'][$tid] =
-      array( 'tid' => $tid, 'children' => array() );
-  }
-
-  // Build tree
-  $root = $branches['0'];
-  unset( $branches['0'] );
-  _lwts_custom_pages_assign_child_terms( &$root, &$branches );
-  return $root;
-}
-
-/**
- * Helper fn to convert terms array to tree.
- *
- * @param $current_term
- *   A term (already inserted in to the tree) that has children.
- *   array( 'tid' => term ID, 'children' => array( term ID of child ) )
- * @param $branches
- *   Array of terms with children, not yet placed in tree.
- */
-function _lwts_custom_pages_assign_child_terms( &$current_term, &$branches ) {
-
-  // Iterate through the IDs of the children of the current term.
-  foreach ( $current_term['children'] as $child ) {
-
-    // Iterate through the unconnected branches.
-    foreach ( $branches as $branch ) {
-
-      // Is the branch a child of the current term?
-      if ( $child['tid'] === $branch['tid'] ) {
-
-        // Move the branch to its place in the heirarchy.
-        $current_term['children'][ $child['tid'] ] = $branch;
-        unset( $branches[$child['tid']] );
-
-        if ( !empty( $current_term['children'][ $child['tid'] ]['children'] ) ) {
-          _lwts_custom_pages_assign_child_terms(
-            $current_term['children'][ $child['tid'] ], $branches );
-        }
+        // Close row
+        $result .= '</div>';
       }
     }
-  }
-}
 
-/**
- * In a vocab tree, make all terms immediate children of top level terms.
- *
- * @param $tree
- *   A vocabulary tree as returned by _lwts_custom_pages_get_vocabulary_tree
- *
- * @return
- *   array( top_level_term_ID => array( all sub term IDs of any depth )
- */
-function _lwts_custom_pages_compress_vocabulary_tree( $tree ) {
-
-  // Add the IDs of all sub-terms, of any depth, to the children of the
-  // top level term.
-  $top_level_terms = array();
-  foreach ( $tree['children'] as $top_level_term ) {
-    foreach ( $top_level_term['children'] as $sub_term ) {
-      _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term );
-    }
-    $top_level_terms[] = $top_level_term;
+    $index++;
   }
 
-  // Simplify the structure of the top level term array from
-  //   array( 'tid' => ID, 'children' => array( IDs ) )
-  // to
-  //   array( ID => array( own/sub-term ID => own/sub-term ID ) )
-  $result = array();
-  foreach ( $top_level_terms as $top_level_term ) {
-    $result[ $top_level_term['tid'] ] = $top_level_term['children'];
-    $result[ $top_level_term['tid'] ][ $top_level_term['tid'] ] =
-      $top_level_term['tid'];
+  // Is the current row unfinished?
+  if ( $index % $num_cols != 1 ) {
+
+    //// Finish off the row.
+    //while ( $index % $num_cols != 0 ) {
+    //$result .= '<div class="lwts-custom-page-view-pane empty ' .
+    //  $num_cols .'-columns"></br></div>';
+    //  $index++;
+    //}
+    $result .= '</div>';
   }
-  return $result;
+
+  $result .= '</div>';  // vocab
+  return array( $result, $nodes_to_exclude );
 }
 
-/**
- * Add the sub-term ID to the children of the top level term.
- *
- * @param $top_level_term
- *   Top level taxonomy term. array( 'tid' => ID, 'children' => array() )
- * @param $sub_term
- *   A taxonomy term of depth > 1. Same structure as top level term.
- */
-function _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term ) {
 
-  // Copy children of the sub_term so that they do not get overwritten.
-  $sub_sub_terms = $sub_term['children'];
+///////// OLD HOME PAGE CODE COMMENTED OUT BELOW //////////////
 
-  // Add the ID of the sub_term to the children of the top level term,
-  // replacing the existing associative array.
-  $top_level_term['children'][ $sub_term['tid'] ] = $sub_term['tid'];
-
-  foreach( $sub_sub_terms as $sub_sub_term ) {
-    _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_sub_term );
-  }
-}
-
-/**
- * For each top level term, get a unique node tagged with that term.
- *
- * @param $node_terms
- *   array( Node ID => array( term IDs ) )
- * @param $top_level_terms
- *   array( top level term ID => array( top level + sub-term IDs ) )
- *
- * @return
- *   A set of unique nodes. array( top level term ID => node ID )
- */
-function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms ) {
-
-  $result = array();
-
-  foreach ( $top_level_terms as $top_level_term_id => $term_descendants ) {
-
-    reset( $node_terms );
-
-    // Iterate through available nodes.
-    while ( list( $node_id, $node_term_set ) = each( $node_terms ) ) {
-
-      // Is this node tagged with the current term or its descendants?
-      if ( array_intersect( $node_term_set, $term_descendants ) ) {
-
-        // Found a node to display. Remove it from array and exit loop.
-        $result[$top_level_term_id]['nid'] = $node_id;
-        $result[$top_level_term_id]['terms'] = $node_term_set;
-        unset( $node_terms[$node_id] );
-        break;
-      }
-    }
-  }
-  return $result;
-}
-
-/**
- * Get the CSS necessary to make the page look panel-like.
- *
- * @param $vocab_class
- *   An (html attribute) class that identifies a given vocabulary.
- * @param $num_cols
- *   The number of columns for the given vocabulary.
- *
- * @return
- *   A string containing CSS for taxonomy-term "panes".
- */
-function _lwts_custom_pages_get_css( $vocab_class, $num_cols ) {
-
-  $width = ( 100.0 / $num_cols ) - 2.0;
-  $css = '.' . $vocab_class . ' .taxonomy-term{float:left;width:' .
-    $width . '%;padding:0 0.5em;}';
-  //dsm( $css );
-  return $css;
-}
-
-/**
- * Get the markup to show a given term-related node.
- *
- * @param $term_id
- *   The ID of the term that the node is related to.
- * @param $node_id
- *   The ID of the node to be displayed.
- * @param $view
- *   The kind of view to show, e.g. 'teaser', 'full', 'something-else'
- * @param $classes
- *   As string containing any classes to be added to the node-wrapping div.
- *
- * @return
- *   Returns the markup for the term-related node.
- */
-function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view, $classes ) {
-
-  $result = '';
-
-  // get term name
-  $term = taxonomy_term_load( $term_id );
-  $clean_term_name = strtolower( str_replace( ' ', '-', $term->name ) );
-
-  // div - term name
-  $result .= '<div class="taxonomy-term taxonomy-term-' . $term_id . ' ' .
-    $clean_term_name . ' ' . $classes . '">';
-
-  // render term name
-  $result .= '<h3>' . $term->name . '</h3>';
-
-  // render node as teaser
-  $result .= '<div class="term-related-node clearfix">';
-  $result .= drupal_render( node_view( node_load( $node_id ), $view ) );
-  $result .= '</div>';
-  
-  // close div - term name
-  $result .= '</div>';
-
-  return $result;
-}
+///**
+// * Page callback for the home page.
+// */
+//function _lwts_custom_pages_page_callback() {
+//
+//  $page_id = arg(0);
+//  $required_term_name = arg(1);
+//  $config = _lwts_custom_pages_get_page_config( $page_id );
+//  if ( !empty( $required_term_name ) ) {
+//    $required_term = array_pop( taxonomy_get_term_by_name( arg(1)) );
+//    //dsm( $required_term);
+//    drupal_set_title( $required_term->name );
+//  }
+//  else {
+//    $required_term = NULL;
+//  }
+//
+//  // Get the terms for each node that is tagged with a term from the
+//  // relevant vocabularies.
+//  $node_terms = _lwts_custom_pages_get_node_terms(
+//    $config->sort_property,
+//    $config->is_sticky_applies,
+//    $config->vids,
+//    empty($required_term) ? NULL : $required_term->tid
+//  );
+//  //dsm( $node_terms );
+//
+//  $result =
+//    '<div class="lwts-custom-page lwts-custom-page-' . $page_id . '">';
+//
+//  foreach ( $config->vids as $vid ) {
+//    $tree = _lwts_custom_pages_get_vocabulary_tree( $vid );
+//    //dsm( $tree );
+//    $top_level_terms = _lwts_custom_pages_compress_vocabulary_tree( $tree );
+//    //dsm( $top_level_terms );
+//
+//    $nodes_to_display = _lwts_custom_pages_get_nodes_to_display(
+//      &$node_terms, $top_level_terms );
+//    //dsm( $nodes_to_display );
+//
+//    $class = 'vocabulary-' . $vid;
+//    $num_cols = min( count( $top_level_terms ), $config->max_cols );
+//    drupal_add_css( _lwts_custom_pages_get_css( $class, $num_cols ),
+//      array( 'type' => 'inline' ) );
+//
+//    $result .= '<div class="vocabulary ' . $class . ' clearfix">';
+//    $result .= '<div class="lwts-custom-page-row clearfix">';
+//    $index = 1;
+//    foreach ( $nodes_to_display as $term_id => $node ) {
+//
+//      // HALF A HACK - Hard coded term names - it does stop a renamed
+//      // taxonomy from spoiling the CSS.
+//      $classes = in_array( 1, $node['terms'] ) ? 'Education' : 'Action';
+//
+//      $result .= _lwts_custom_pages_get_rendered_node(
+//        $term_id, $node['nid'], 'teaser', $classes );
+//
+//      // Was this the last node in the row?
+//      if ( ( $index % $num_cols ) == 0 ) {
+//        $result .= '</div><div class="lwts-custom-page-row clearfix">';
+//      }
+//      $index++;
+//    }
+//    $result .= '</div></div>';
+//  }
+//  $result .= '</div>';
+//
+//  return $result;
+//}
+//
+//function _lwts_custom_pages_get_required_term( $term_name ) {
+//}
+//
+//function _lwts_custom_pages_get_page_config( $page_id ) {
+//
+//  // HACK// HACK// HACK// HACK// HACK// HACK      // HACK!!!!!!
+//  // Replace switch with variable_get() calls and per-page config pages.
+//
+//  $result = new StdClass;
+//
+//  switch ( $page_id ) {
+//  case 'home-page' :
+//    $result->sort_property = 'created';
+//    $result->is_sticky_applies = TRUE;
+//    $result->vids = array( 2, 3 );
+//    $result->max_cols = 3;
+//    break;
+//  case 'origin' :
+//    $result->sort_property = 'created';
+//    $result->is_sticky_applies = TRUE;
+//    $result->vids = array( 2, 3 );
+//    $result->max_cols = 3;
+//    break;
+//  }
+//  return $result;
+//}
+//
+///**
+// * Get data from nodes tagged with terms from a given set of vocabularies.
+// *
+// * @todo genericise more - sorting currently restricted to a colum in the
+// * node table, which won't work for user ratings or most visited.
+// *
+// * @param $sort_property_column string
+// *   The name of a column in the node table on which to sort
+// * @param $is_sticky_applies boolean
+// *   Should sticky nodes come at the top of the list?
+// * @param $vids array( integer )
+// *   The set of vocabulary ids that should be considered.
+// * @param $max_nodes integer
+// *   The maximum number of nodes to load.
+// * @param $required_tid
+// *   The ID of the term that returned nodes must be tagged with, else NULL.
+// *
+// * @return
+// *   array( node_id => array(  ) )
+// */
+//function _lwts_custom_pages_get_node_terms( $sort_property_column, $is_sticky_applies, $vids, $required_tid ) {
+//
+//  // Tables required:
+//  // node - nid ( + sort_property )
+//  // taxonomy_vocabulary - name
+//  // taxonomy_term_data - to connect vocab to terms
+//  // taxonomy_index - for node-term join
+//  //
+//  $query = db_select( 'node', 'n' );
+//  $query->join( 'taxonomy_index', 'ti', 'ti.nid = n.nid' );
+//  $query->join( 'taxonomy_term_data', 'ttd', 'ttd.tid = ti.tid' );
+//  $query->join( 'taxonomy_vocabulary', 'tv', 'tv.vid = ttd.vid' );
+//  $query->addField( 'n', 'nid', 'node_id' );
+//  $query->addField( 'ttd', 'tid', 'term_id' );
+//  $query->condition( 'tv.vid', $vids, 'IN' );
+//
+//  if ( $is_sticky_applies ) {
+//    $query->orderBy( 'n.sticky', 'DESC' );
+//  }
+//
+//  $query->orderBy( 'n.' . $sort_property_column, 'DESC' );
+//  $query->orderBy( 'ttd.weight', 'ASC' );
+//
+//  if ( !empty( $required_term ) ) {
+//    $subquery = db_select( 'taxonomy_index', 'ti' );
+//    $subquery->addField( 'ti', 'nid', 'node_id' );
+//    $subquery->condition( 'ti.tid', $required_tid );
+//    $query->condition( 'n.nid', $subquery, 'IN' );
+//  }
+//
+//  $result_set =  $query->execute();
+//  $rows = array();
+//  while ( $row = $result_set->fetchAssoc() ) {
+//    $rows[ $row['node_id'] ][ $row['term_id'] ] = $row['term_id'];
+//  }
+//
+//  //if ( !empty( $required_term ) ) {
+//  //  global $_lwts_custom_pages_required_term;
+//  //  $_lwts_custom_pages_required_term = $required_term;
+//  //  $rows = array_filter(
+//  //    $rows, '_lwts_custom_pages_includes_required_term' );
+//  //}
+//  return $rows;
+//}
+//
+///**
+// * Do the given terms include the (global) required term?
+// *
+// * Callback fn for array_filter.
+// * Helper fn for _lwts_custom_pages_get_node_terms
+// *
+// * @param $terms
+// *   An array of term IDs
+// *
+// * @return
+// *   TRUE if the required term is present, else FALSE;
+// */
+//function _lwts_custom_pages_includes_required_term( $terms ) {
+//  global $_lwts_custom_pages_required_term;
+//  return in_array( $_lwts_custom_pages_required_term, $terms );
+//}
+//
+///**
+// * Get the term IDs of a vocabulary keyed by root terms.
+// *
+// * @param $vid integer
+// *   The ID of the required vocabulary
+// *
+// * @return
+// *   array( top_level_tid => array( child_ID ) )
+// */
+//function _lwts_custom_pages_get_vocabulary_tree( $vid ) {
+//
+//  $terms = taxonomy_get_tree( $vid );
+//  $branches = array();
+//
+//  // Collect terms according to parentage
+//  foreach ( $terms as $term ) {
+//    $tid = $term->tid;
+//    $parent = $term->parents[0];  // HACK - Assumes single parent!
+//
+//    if ( empty($branches[$parent]) ) {
+//      $branches[$parent] = array();
+//      $branches[$parent]['tid'] = $parent;
+//      $branches[$parent]['children'] = array();
+//    }
+//    $branches[$parent]['children'][$tid] =
+//      array( 'tid' => $tid, 'children' => array() );
+//  }
+//
+//  // Build tree
+//  $root = $branches['0'];
+//  unset( $branches['0'] );
+//  _lwts_custom_pages_assign_child_terms( &$root, &$branches );
+//  return $root;
+//}
+//
+///**
+// * Helper fn to convert terms array to tree.
+// *
+// * @param $current_term
+// *   A term (already inserted in to the tree) that has children.
+// *   array( 'tid' => term ID, 'children' => array( term ID of child ) )
+// * @param $branches
+// *   Array of terms with children, not yet placed in tree.
+// */
+//function _lwts_custom_pages_assign_child_terms( &$current_term, &$branches ) {
+//
+//  // Iterate through the IDs of the children of the current term.
+//  foreach ( $current_term['children'] as $child ) {
+//
+//    // Iterate through the unconnected branches.
+//    foreach ( $branches as $branch ) {
+//
+//      // Is the branch a child of the current term?
+//      if ( $child['tid'] === $branch['tid'] ) {
+//
+//        // Move the branch to its place in the heirarchy.
+//        $current_term['children'][ $child['tid'] ] = $branch;
+//        unset( $branches[$child['tid']] );
+//
+//        if ( !empty( $current_term['children'][ $child['tid'] ]['children'] ) ) {
+//          _lwts_custom_pages_assign_child_terms(
+//            $current_term['children'][ $child['tid'] ], $branches );
+//        }
+//      }
+//    }
+//  }
+//}
+//
+///**
+// * In a vocab tree, make all terms immediate children of top level terms.
+// *
+// * @param $tree
+// *   A vocabulary tree as returned by _lwts_custom_pages_get_vocabulary_tree
+// *
+// * @return
+// *   array( top_level_term_ID => array( all sub term IDs of any depth )
+// */
+//function _lwts_custom_pages_compress_vocabulary_tree( $tree ) {
+//
+//  // Add the IDs of all sub-terms, of any depth, to the children of the
+//  // top level term.
+//  $top_level_terms = array();
+//  foreach ( $tree['children'] as $top_level_term ) {
+//    foreach ( $top_level_term['children'] as $sub_term ) {
+//      _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term );
+//    }
+//    $top_level_terms[] = $top_level_term;
+//  }
+//
+//  // Simplify the structure of the top level term array from
+//  //   array( 'tid' => ID, 'children' => array( IDs ) )
+//  // to
+//  //   array( ID => array( own/sub-term ID => own/sub-term ID ) )
+//  $result = array();
+//  foreach ( $top_level_terms as $top_level_term ) {
+//    $result[ $top_level_term['tid'] ] = $top_level_term['children'];
+//    $result[ $top_level_term['tid'] ][ $top_level_term['tid'] ] =
+//      $top_level_term['tid'];
+//  }
+//  return $result;
+//}
+//
+///**
+// * Add the sub-term ID to the children of the top level term.
+// *
+// * @param $top_level_term
+// *   Top level taxonomy term. array( 'tid' => ID, 'children' => array() )
+// * @param $sub_term
+// *   A taxonomy term of depth > 1. Same structure as top level term.
+// */
+//function _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_term ) {
+//
+//  // Copy children of the sub_term so that they do not get overwritten.
+//  $sub_sub_terms = $sub_term['children'];
+//
+//  // Add the ID of the sub_term to the children of the top level term,
+//  // replacing the existing associative array.
+//  $top_level_term['children'][ $sub_term['tid'] ] = $sub_term['tid'];
+//
+//  foreach( $sub_sub_terms as $sub_sub_term ) {
+//    _lwts_custom_pages_add_sub_term_ids_to_top_level( &$top_level_term, $sub_sub_term );
+//  }
+//}
+//
+///**
+// * For each top level term, get a unique node tagged with that term.
+// *
+// * @param $node_terms
+// *   array( Node ID => array( term IDs ) )
+// * @param $top_level_terms
+// *   array( top level term ID => array( top level + sub-term IDs ) )
+// *
+// * @return
+// *   A set of unique nodes. array( top level term ID => node ID )
+// */
+//function _lwts_custom_pages_get_nodes_to_display( &$node_terms, $top_level_terms ) {
+//
+//  $result = array();
+//
+//  foreach ( $top_level_terms as $top_level_term_id => $term_descendants ) {
+//
+//    reset( $node_terms );
+//
+//    // Iterate through available nodes.
+//    while ( list( $node_id, $node_term_set ) = each( $node_terms ) ) {
+//
+//      // Is this node tagged with the current term or its descendants?
+//      if ( array_intersect( $node_term_set, $term_descendants ) ) {
+//
+//        // Found a node to display. Remove it from array and exit loop.
+//        $result[$top_level_term_id]['nid'] = $node_id;
+//        $result[$top_level_term_id]['terms'] = $node_term_set;
+//        unset( $node_terms[$node_id] );
+//        break;
+//      }
+//    }
+//  }
+//  return $result;
+//}
+//
+///**
+// * Get the CSS necessary to make the page look panel-like.
+// *
+// * @param $vocab_class
+// *   An (html attribute) class that identifies a given vocabulary.
+// * @param $num_cols
+// *   The number of columns for the given vocabulary.
+// *
+// * @return
+// *   A string containing CSS for taxonomy-term "panes".
+// */
+//function _lwts_custom_pages_get_css( $vocab_class, $num_cols ) {
+//
+//  $width = ( 100.0 / $num_cols ) - 2.0;
+//  $css = '.' . $vocab_class . ' .taxonomy-term{float:left;width:' .
+//    $width . '%;padding:0 0.5em;}';
+//  //dsm( $css );
+//  return $css;
+//}
+//
+///**
+// * Get the markup to show a given term-related node.
+// *
+// * @param $term_id
+// *   The ID of the term that the node is related to.
+// * @param $node_id
+// *   The ID of the node to be displayed.
+// * @param $view
+// *   The kind of view to show, e.g. 'teaser', 'full', 'something-else'
+// * @param $classes
+// *   As string containing any classes to be added to the node-wrapping div.
+// *
+// * @return
+// *   Returns the markup for the term-related node.
+// */
+//function _lwts_custom_pages_get_rendered_node( $term_id, $node_id, $view, $classes ) {
+//
+//  $result = '';
+//
+//  // get term name
+//  $term = taxonomy_term_load( $term_id );
+//  $clean_term_name = strtolower( str_replace( ' ', '-', $term->name ) );
+//
+//  // div - term name
+//  $result .= '<div class="taxonomy-term taxonomy-term-' . $term_id . ' ' .
+//    $clean_term_name . ' ' . $classes . '">';
+//
+//  // render term name
+//  $result .= '<h3>' . $term->name . '</h3>';
+//
+//  // render node as teaser
+//  $result .= '<div class="term-related-node clearfix">';
+//  $result .= drupal_render( node_view( node_load( $node_id ), $view ) );
+//  $result .= '</div>';
+//  
+//  // close div - term name
+//  $result .= '</div>';
+//
+//  return $result;
+//}
 
 
 

@@ -100,7 +100,7 @@ function _lwts_custom_blocks_get_term_ids_from_node_id( $node_id ) {
   $result_set =  $query->execute();
   $term_ids = $result_set->fetchCol();
 
-  dsm( $term_ids );
+  //dsm( $term_ids );
 
   return $term_ids;
 }

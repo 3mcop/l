@@ -10,6 +10,9 @@ function lwts_custom_blocks_block_info() {
   $blocks['topic-nav'] = array (
     'info' => 'LWtS Topic navigation',
   );
+  $blocks['related-articles'] = array (
+    'info' => 'LWtS Related articles',
+  );
 
   return $blocks;
 }
@@ -19,6 +22,10 @@ function lwts_custom_blocks_block_view( $delta = '' ) {
   switch ( $delta ) {
   case 'topic-nav' :
     $block['content'] = _lwts_custom_blocks_topic_nav_content();
+    return $block;
+  case 'related-articles' :
+    $block['subject'] = t( 'Related articles' );
+    $block['content'] = _lwts_custom_blocks_related_articles_content();
     return $block;
   }
 }
@@ -67,4 +74,34 @@ function _lwts_custom_blocks_topic_nav_content() {
   return $result;
 }
 
+function _lwts_custom_blocks_related_articles_content() {
+
+  if ( arg(0) != 'node' || !is_numeric( arg(1) ) ) {
+    return;
+  }
+
+  $node_id = arg(1);
+  $node = node_load( $node_id );
+  $term_ids = _lwts_custom_blocks_get_term_ids_from_node_id( $node_id );
+
+  // @todo Using all terms, including Knowledge Type terms, for now.
+  // Customer may want us to refine this.
+  $terms_string = implode( $term_ids, '+' );
+
+  return views_embed_view( 'related_articles', 'default', $terms_string );
+}
+
+function _lwts_custom_blocks_get_term_ids_from_node_id( $node_id ) {
+
+  $query = db_select( 'taxonomy_index', 'ti' );
+  $query->addField( 'ti', 'tid', 'tid' );
+  $query->condition( 'ti.nid', $node_id, '=' );
+
+  $result_set =  $query->execute();
+  $term_ids = $result_set->fetchCol();
+
+  dsm( $term_ids );
+
+  return $term_ids;
+}
 

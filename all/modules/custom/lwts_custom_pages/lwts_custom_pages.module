@@ -346,15 +346,18 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
     $exclude =
       empty( $nodes_to_exclude ) ? NULL : implode( $nodes_to_exclude, '+' );
 
+    // Is the given term is a topic.
     if ( $vocab_id == 3 ) {
+      // Topics are treated differently - they use depth
       $output = $view->preview( 'default', array(
-            'all', $term->tid, $topic_depth, $exclude
-            ) );
+        'all', $term->tid, $topic_depth, $exclude
+      ) );
     }
     else {
+      // The given term is not a topic. It is a "constraint" term.
       $output = $view->preview( 'default', array(
-            $term->tid, 'all', $topic_depth, $exclude
-            ) );
+        $term->tid, 'all', $topic_depth, $exclude
+      ) );
     }
 
     if ( !empty( $view->result ) ) {

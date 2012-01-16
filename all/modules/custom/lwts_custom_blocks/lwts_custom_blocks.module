@@ -34,8 +34,13 @@ function _lwts_custom_blocks_topic_nav_content() {
 
   // HACK - hard coded relevant vocabulary id.
   $topics_vid = 3;
+
+  // Get the top level Topic terms
   $top_level_terms = taxonomy_get_tree( $topics_vid, 0, 1 );
+
+  // For the first taxonomy branch: In order to add a CSS class.
   $first = TRUE;
+
   $result = '';
 
   foreach ( $top_level_terms as $top_level_term ) {
@@ -53,8 +58,10 @@ function _lwts_custom_blocks_topic_nav_content() {
       l( $top_level_term->name, 'taxonomy/term/' . $top_level_term->tid );
     $result .= '</div><br/>';
 
+    // Only fetch the next level of terms. Don't fetch third and lower
+    // levels of terms.
     $sub_terms = taxonomy_get_tree(
-      $top_level_term->vid, $top_level_term->tid, NULL );
+      $top_level_term->vid, $top_level_term->tid, 1 );
 
     if ( empty( $sub_terms ) ) {
       $result .= '<div class="sub-topics empty"></div>';

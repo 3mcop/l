@@ -54,9 +54,15 @@ function articles_context_default_contexts() {
   $context->reactions = array(
     'block' => array(
       'blocks' => array(
-        'nodeblock-78' => array(
+        'nodeblock-73' => array(
           'module' => 'nodeblock',
-          'delta' => 78,
+          'delta' => 73,
+          'region' => 'header',
+          'weight' => '-10',
+        ),
+        'nodeblock-74' => array(
+          'module' => 'nodeblock',
+          'delta' => 74,
           'region' => 'header',
           'weight' => '-10',
         ),
@@ -64,6 +70,12 @@ function articles_context_default_contexts() {
           'module' => 'system',
           'delta' => 'main-menu',
           'region' => 'navigation',
+          'weight' => '-10',
+        ),
+        'nodeblock-75' => array(
+          'module' => 'nodeblock',
+          'delta' => 75,
+          'region' => 'footer',
           'weight' => '-10',
         ),
       ),

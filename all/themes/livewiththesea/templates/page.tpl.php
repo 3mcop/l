@@ -118,7 +118,7 @@
 
     <div id="content" class="column"><div class="section">
       <?php print render($page['highlighted']); ?>
-      <?php print $breadcrumb; ?>
+
       <a id="main-content"></a>
       <?php print render($title_prefix); ?>
       <?php if ($title): ?>
@@ -154,7 +154,7 @@
         )); ?>
 
         <?php print render($page['navigation']); ?>
-
+              <?php print $breadcrumb; ?>
       </div></div><!-- /.section, /#navigation -->
     <?php endif; ?>
 

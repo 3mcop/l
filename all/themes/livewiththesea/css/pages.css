@@ -24,6 +24,9 @@ body {
 
 #page {
   background:#FFF;
+  -webkit-box-shadow: 7px 7px 7px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 7px 7px 7px rgba(0, 0, 0, 0.3);
+  box-shadow: 7px 7px 7px rgba(0, 0, 0, 0.3);
 }
 
 /*
@@ -115,6 +118,18 @@ div#site-name /* The name of the website */ {
 
 .breadcrumb /* The path to the current page in the form of a list of links */ {
   padding-bottom: 0; /* Undo system.css */
+  margin:0 25px;
+  border-bottom:1px dotted #545454;
+}
+
+.breadcrumb a{
+  color:#545454;
+  text-decoration:none;
+}
+
+.breadcrumb a:hover{
+  color:#dc760f;
+  text-decoration:none;
 }
 
 h1.title, /* The title of the page */
@@ -245,6 +260,7 @@ ul.links li {
 #block-lwts-custom-blocks-topic-nav{
   padding-top:15px;
   margin:0 0 0 0;
+  height:120px
 }
 
 /*
@@ -253,7 +269,7 @@ ul.links li {
 .region-bottom /* Wrapper for any blocks placed in the page bottom region */ {
 }
 .region-footer{
-    padding:0 25px;
+    padding:0 25px 85px;
 }
 
 /* For two-column custom pages */
@@ -288,3 +304,41 @@ ul.links li {
 #block-lwts-custom-blocks-topic-nav .first {
   margin-left: 0;
 }
+
+/**/
+#block-lwts-custom-blocks-topic-nav{
+  
+}
+
+
+/**/
+#block-nodeblock-75{
+  clear:both;
+  margin-top:80px;
+}
+#node-75{
+  width:350px;
+  border-top:1px solid #FFF;
+  margin: 0px auto;
+}
+
+#tandc_ul {
+  width:320px;
+  padding:0;
+  margin:0px auto;
+  }
+
+#tandc_ul li{
+  display:block;
+  float:left;
+}
+#tandc_ul li a{
+  display:block;
+  padding:0px 10px;
+  font-size:0.8em;
+  text-decoration:none;
+}
+#tandc_ul li a:hover{
+  text-decoration:underline;
+}
+

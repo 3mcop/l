@@ -58,3 +58,123 @@ li a.active {
  */
 .block-menu-block {
 }
+
+#block-system-main-menu{
+  height:41px;
+  margin-bottom:18px;
+}
+#block-system-main-menu ul {
+  padding:0;
+  margin:0;
+  border-top:5px solid #545454;
+  height:36px;
+  border-bottom:1px dotted #545454;
+}
+#navigation #block-system-main-menu li {
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:block;
+  height:36px;
+}
+#navigation #block-system-main-menu li.first {
+  margin:0 0 0 25px;
+}
+#block-system-main-menu li a{
+  text-transform:uppercase;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:1.1em;
+  color:#545454;
+  padding:8px 25px;
+  border-top:5px solid #545454;
+  display:block;
+  margin-top:-5px;
+}
+#block-system-main-menu li a.active,
+#block-system-main-menu li a:hover{
+  color:#dc760f;
+  border-top:5px solid #dc760f;
+}
+
+/**********/
+
+#navigation #superfish-1{
+  padding:0;
+  margin:0;
+  border-top:5px solid #545454;
+  height:28px;
+  border-bottom:1px dotted #545454;
+}
+
+#navigation #superfish-1 li{
+  margin:0;
+  padding:0;
+  display:block;
+}
+#navigation #superfish-1 li.first.sf-depth-1{
+  margin-left:25px;
+}
+#superfish-1 a.sf-depth-1{
+  text-transform:uppercase;
+  text-decoration:none;
+
+  font-size:0.9em;
+  color:#545454;
+  padding:8px 13px;
+  margin:0;
+  border-top:5px solid #545454;
+  display:block;
+  margin-top:-5px;
+  
+  /*background:#f99;*/
+}
+#superfish-1 li a.active.sf-depth-1,
+#superfish-1 li a.sf-depth-1:hover{
+  color:#dc760f;
+  border-top:5px solid #dc760f;
+}
+/*2nd level*/
+
+#navigation #superfish-1  ul{
+  border: 1px solid #E3E3E3;
+  -moz-border-radius: 4px 4px 4px 4px;
+  -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.03);
+  border-bottom: medium none;
+  background:#FFF;
+  margin-bottom:3px;
+  margin-top:-3px;
+}
+#navigation #superfish-1  ul li{
+
+}
+#navigation #superfish-1  ul li.first{
+  background: url("../images/nav-indicator.png") no-repeat scroll 15px 0px transparent;
+  margin-top: -8px;
+  padding-top: 10px;
+}
+#navigation #superfish-1  ul li a{
+  /*border-color: #E3E3E3;
+  border-left: 0 none;
+  border-right: 0 none;
+  border-top:0 none;
+  border-style: solid none;
+  border-width: 1px 0;*/
+  color:#545454;
+  text-decoration:none;
+  font-size: 0.8em;
+  padding: 8px 15px;
+  /*background:#F99;*/
+  /*width: 150px;*/
+}
+#navigation #superfish-1  ul li.first a{
+  padding-top:12px
+}
+#navigation #superfish-1  ul li.last a{
+  border-bottom:1px solid #E3E3E3;
+  padding-bottom:15px
+}
+#navigation #superfish-1  ul li a.active,
+#navigation #superfish-1  ul li a:hover{
+  color:#dc760f;
+}

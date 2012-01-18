@@ -45,9 +45,8 @@ body {
  */
 #header {
   margin-top:15px;
-  padding:0 25px;
+  padding:3px 25px 0;
   background:url('../images/header_background.png') 2px 0 repeat-x #FFF;
-  border-bottom:5px solid #545454;
 }
 
 #header .section {
@@ -55,7 +54,7 @@ body {
 
 #logo /* Wrapping link for logo */ {
   float: left; /* LTR */
-  margin: 20px 0 0 0;
+  margin: 20px 0 20px 0;
   padding: 0;
 }
 
@@ -96,7 +95,7 @@ div#site-name /* The name of the website */ {
  * Main (container for everything else)
  */
 #main-wrapper {
-padding:0 25px;
+   /*padding:0 25px;*/
 }
 
 #main {

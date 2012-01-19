@@ -78,6 +78,8 @@ function _lwts_custom_blocks_topic_nav_content() {
 
     $result .= '</div>';
   }
+
+  $result .= '<div class="clearfix"></div>';
   return $result;
 }
 

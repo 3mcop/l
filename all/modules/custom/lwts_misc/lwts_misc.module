@@ -5,9 +5,34 @@
  * LWtS specific code.
  */
 
+
+/**
+ * Implements hook_node_view_alter()
+ */
 function lwts_misc_node_view_alter( &$build ) {
+
+  // Has the AddThis widget been inserted in to the node view?
   if ( ! empty( $build['addthis'] ) ) {
+
+    // Set the weight of the AddThis widget to match design.
     $build['addthis']['#weight'] = 10;
-//  dsm( func_get_args() );
+  }
+}
+
+
+/**
+ * Implements hook_form_alter()
+ */
+function lwts_misc_form_alter( &$form, &$form_state, $form_id ) {
+
+  switch ( $form_id ) {
+
+  // Tried implementing hook_form_search_block_form_alter, but it only
+  // worked while hook_form_alter was also implemented!?!
+  case 'search_block_form' :
+
+    // Set the text to appear in the search text box.
+    $form['search_block_form']['#attributes']['placeholder'] = t('Search');
+    break;
   }
 }

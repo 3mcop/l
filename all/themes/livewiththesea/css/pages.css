@@ -253,14 +253,58 @@ ul.links li {
 .region-footer a{
   color:#FFF;
 }
+.region-footer .top-level-topic{
+   border-bottom:1px solid white;
+}
+.region-footer .top-level-topic a{
+  font-size:1.2em;
+  background:url('../images/wave-icon-blue.png') 0px 4px no-repeat transparent;
+  padding:0 0 0 20px;
+  text-decoration:none;
+  display:block;
+}
+.region-footer br{
+  display:none;
+}
+.region-footer .sub-topics{
+  padding-top:10px;
+}
+.region-footer .sub-topics a{
+  line-height:1.2em;
+  display:block;
+  padding-bottom:10px;
+  text-decoration:none;
+}
+.region-footer .sub-topics a:hover{
+  text-decoration:underline;
+}
+.clearfix{
+  clear:both;
+}
+#block-lwts-custom-blocks-topic-nav{
+  
+  width: 915px;
+  
+}
+#block-lwts-custom-blocks-topic-nav .taxonomy-branch {
+  float: left;
+
+  font-size: 0.8em;
+  padding-right: 15px;
+  width: 133px;
+  
+}
+#block-lwts-custom-blocks-topic-nav .first {
+  margin-left: 0;
+}
 #footer_top{
   height:7px;
-   background:url('../images/footer_background_hi.png') top center repeat-x transparent; 
+  background:url('../images/footer_background_hi.png') top center repeat-x transparent; 
 }
 #block-lwts-custom-blocks-topic-nav{
   padding-top:15px;
   margin:0 0 0 0;
-  height:120px
+  /*height:120px*/
 }
 
 /*
@@ -269,7 +313,7 @@ ul.links li {
 .region-bottom /* Wrapper for any blocks placed in the page bottom region */ {
 }
 .region-footer{
-    padding:0 25px 85px;
+    padding:0 25px 65px;
 }
 
 /* For two-column custom pages */
@@ -296,14 +340,7 @@ ul.links li {
 
 
 /* For the content of the topic nav block */
-#block-lwts-custom-blocks-topic-nav .taxonomy-branch {
-  float: left;
-  font-size: 75%;
-  margin-left: 2.5em;
-}
-#block-lwts-custom-blocks-topic-nav .first {
-  margin-left: 0;
-}
+
 
 /**/
 #block-lwts-custom-blocks-topic-nav{
@@ -315,6 +352,7 @@ ul.links li {
 #block-nodeblock-75{
   clear:both;
   margin-top:80px;
+  margin-left:40px;
 }
 #node-75{
   width:350px;

@@ -141,6 +141,10 @@ h3.title /* Comment title */ {
   margin: 0;
 }
 
+h1.title{
+  margin-bottom: 16px;
+}
+
 tr.even /* Some tables have rows marked even or odd. */ {
   /* background-color: #eee; */ /* Drupal core uses a #eee background */
 }
@@ -236,9 +240,56 @@ ul.links li {
 .region-sidebar-second {
 }
 
+.region-sidebar-second h2 {
+  background:url('../images/wave-icon-grey.png') 0px 2px no-repeat transparent;
+  padding-left: 25px;
+  font-weight:normal;
+  font-size:1.2em;
+  border-bottom:3px solid #545454;
+  padding-bottom:5px;
+  margin:16px 0;
+}
 .region-sidebar-second .section {
 }
 
+.region-sidebar-second .views-field img{
+  padding:2px;
+  border:1px solid #DDD;
+}
+.region-sidebar-second .views-field-field-article-thumbnail,
+.region-sidebar-second .views-field-field-video{
+  width:79px;
+  height:63px;
+  margin:0 12px 0 0;  
+  float:left;
+}
+.region-sidebar-second .views-field-field-video{
+  display:none;
+}
+.region-sidebar-second .views-field-title,
+.region-sidebar-second .views-field-body{
+  font-size:0.8em;
+  line-height:1.2em;
+  float:left;
+  width:180px;
+  
+}
+.region-sidebar-second .views-field-title{
+  font-weight:bold; 
+}
+.region-sidebar-second .views-field-title a{
+  text-decoration:none;
+  color:#545454;
+}
+.region-sidebar-second .views-field-title a:hover{
+  color:#dc760f;
+}
+
+.region-sidebar-second .view-related-articles .views-row{
+  clear:both;
+  height:90px;
+  margin-bottom:12px;
+}
 /*
  * Footer
  */

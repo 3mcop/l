@@ -56,7 +56,7 @@ function _lwts_custom_blocks_topic_nav_content() {
     $result .= '<div class="top-level-topic">';
     $result .=
       l( $top_level_term->name, 'taxonomy/term/' . $top_level_term->tid );
-    $result .= '</div><br/>';
+    $result .= '</div>';
 
     // Only fetch the next level of terms. Don't fetch third and lower
     // levels of terms.

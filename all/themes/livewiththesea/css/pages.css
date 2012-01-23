@@ -141,6 +141,10 @@ h3.title /* Comment title */ {
   margin: 0;
 }
 
+h1.title{
+  margin-bottom: 16px;
+}
+
 tr.even /* Some tables have rows marked even or odd. */ {
   /* background-color: #eee; */ /* Drupal core uses a #eee background */
 }
@@ -236,9 +240,56 @@ ul.links li {
 .region-sidebar-second {
 }
 
+.region-sidebar-second h2 {
+  background:url('../images/wave-icon-grey.png') 0px 2px no-repeat transparent;
+  padding-left: 25px;
+  font-weight:normal;
+  font-size:1.2em;
+  border-bottom:3px solid #545454;
+  padding-bottom:5px;
+  margin:16px 0;
+}
 .region-sidebar-second .section {
 }
 
+.region-sidebar-second .views-field img{
+  padding:2px;
+  border:1px solid #DDD;
+}
+.region-sidebar-second .views-field-field-article-thumbnail,
+.region-sidebar-second .views-field-field-video{
+  width:79px;
+  height:63px;
+  margin:0 12px 0 0;  
+  float:left;
+}
+.region-sidebar-second .views-field-field-video{
+  display:none;
+}
+.region-sidebar-second .views-field-title,
+.region-sidebar-second .views-field-body{
+  font-size:0.8em;
+  line-height:1.2em;
+  float:left;
+  width:180px;
+  
+}
+.region-sidebar-second .views-field-title{
+  font-weight:bold; 
+}
+.region-sidebar-second .views-field-title a{
+  text-decoration:none;
+  color:#545454;
+}
+.region-sidebar-second .views-field-title a:hover{
+  color:#dc760f;
+}
+
+.region-sidebar-second .view-related-articles .views-row{
+  clear:both;
+  height:90px;
+  margin-bottom:12px;
+}
 /*
  * Footer
  */
@@ -253,14 +304,58 @@ ul.links li {
 .region-footer a{
   color:#FFF;
 }
+.region-footer .top-level-topic{
+   border-bottom:1px solid white;
+}
+.region-footer .top-level-topic a{
+  font-size:1.2em;
+  background:url('../images/wave-icon-blue.png') 0px 4px no-repeat transparent;
+  padding:0 0 0 20px;
+  text-decoration:none;
+  display:block;
+}
+.region-footer br{
+  display:none;
+}
+.region-footer .sub-topics{
+  padding-top:10px;
+}
+.region-footer .sub-topics a{
+  line-height:1.2em;
+  display:block;
+  padding-bottom:10px;
+  text-decoration:none;
+}
+.region-footer .sub-topics a:hover{
+  text-decoration:underline;
+}
+.clearfix{
+  clear:both;
+}
+#block-lwts-custom-blocks-topic-nav{
+  
+  width: 915px;
+  
+}
+#block-lwts-custom-blocks-topic-nav .taxonomy-branch {
+  float: left;
+
+  font-size: 0.8em;
+  padding-right: 15px;
+  width: 133px;
+  
+}
+#block-lwts-custom-blocks-topic-nav .first {
+  margin-left: 0;
+}
 #footer_top{
   height:7px;
-   background:url('../images/footer_background_hi.png') top center repeat-x transparent; 
+  background:url('../images/footer_background_hi.png') top center repeat-x transparent; 
 }
 #block-lwts-custom-blocks-topic-nav{
   padding-top:15px;
   margin:0 0 0 0;
-  height:120px
+  /*height:120px*/
 }
 
 /*
@@ -269,7 +364,7 @@ ul.links li {
 .region-bottom /* Wrapper for any blocks placed in the page bottom region */ {
 }
 .region-footer{
-    padding:0 25px 85px;
+    padding:0 25px 65px;
 }
 
 /* For two-column custom pages */
@@ -296,14 +391,7 @@ ul.links li {
 
 
 /* For the content of the topic nav block */
-#block-lwts-custom-blocks-topic-nav .taxonomy-branch {
-  float: left;
-  font-size: 75%;
-  margin-left: 2.5em;
-}
-#block-lwts-custom-blocks-topic-nav .first {
-  margin-left: 0;
-}
+
 
 /**/
 #block-lwts-custom-blocks-topic-nav{
@@ -315,6 +403,7 @@ ul.links li {
 #block-nodeblock-75{
   clear:both;
   margin-top:80px;
+  margin-left:40px;
 }
 #node-75{
   width:350px;

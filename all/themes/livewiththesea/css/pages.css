@@ -263,9 +263,11 @@ ul.links li {
   margin:0 12px 0 0;  
   float:left;
 }
+/*
 .region-sidebar-second .views-field-field-video{
   display:none;
 }
+  */
 .region-sidebar-second .views-field-title,
 .region-sidebar-second .views-field-body{
   font-size:0.8em;

@@ -97,7 +97,8 @@ function _lwts_custom_blocks_related_articles_content() {
   // Customer may want us to refine this.
   $terms_string = implode( $term_ids, '+' );
 
-  return views_embed_view( 'related_articles', 'default', $terms_string );
+  return views_embed_view(
+    'related_articles', 'default', $terms_string, $node_id );
 }
 
 function _lwts_custom_blocks_get_term_ids_from_node_id( $node_id ) {

@@ -55,7 +55,7 @@ function filefield_sources_theme() {
  * This returns a list of widgets that are compatible with FileField Sources.
  */
 function filefield_sources_filefield_sources_widgets() {
-  return array('file_generic', 'image_image');
+  return array('file_generic', 'image_image', 'video_upload');
 }
 
 /**

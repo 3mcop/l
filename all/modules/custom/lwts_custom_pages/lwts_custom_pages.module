@@ -332,6 +332,7 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
   $num_cols = min( count( $terms ), $max_cols );
   $index = 1;
   $topic_depth = 10;
+  $pane = 1;
 
   foreach( $terms as $term ) {
 
@@ -368,7 +369,8 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
         _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
 
       $result .= '<div class="lwts-custom-page-view-pane-outer columns-'
-        . $num_cols .'">';
+        . $num_cols .'" id="vocab-' . $vocab_id .'-pane-' . $pane . '">';
+      $pane++;
       $result .= '<h3>' . $term->name . '</h3>';
       $result .= '<div class="lwts-custom-page-view-pane-inner '
         . $knowledge_type . '">';

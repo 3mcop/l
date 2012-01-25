@@ -118,6 +118,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $max_rows = 5;
   $action_tid = 2;
   $education_tid = 1;
+  $display_name = 'block_2';
 
   // Irrelevant in the context of this function. Included for readability.
   $topic_depth = 0;
@@ -130,17 +131,17 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     unset( $views );
     $views = array();
     $views[0] = $teaser_view_template->clone_view();
-    $views[0]->display['default']->display_options['pager']['options']['offset'] = $i;
+    $views[0]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
     $views[1] = $teaser_view_template->clone_view();
-    $views[1]->display['default']->display_options['pager']['options']['offset'] = $i;
+    $views[1]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
 
     // "Preview" the views, calculating their results in the process.
     unset( $views_output );
     $views_output = array();
-    $views_output[0] = $views[0]->preview( 'default', array(
+    $views_output[0] = $views[0]->preview( $display_name, array(
       $action_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
-    $views_output[1] = $views[1]->preview( 'default', array(
+    $views_output[1] = $views[1]->preview( $display_name, array(
       $education_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 
@@ -237,7 +238,7 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
     $view = $teaser_view_template->clone_view();
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
-    $view_output = $view->preview( 'default', array(
+    $view_output = $view->preview( 'block_2', array(
       $constraint, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 

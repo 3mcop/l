@@ -373,8 +373,9 @@ ul.links li {
 .lwts-custom-page-view-pane,
 .lwts-custom-page-view-pane-outer {
   float: left;
-  width: 48%;
-  padding: 0 0.5em;
+  
+  padding: 0;
+  margin:0;
 }
 
 .columns-3 {
@@ -433,3 +434,60 @@ ul.links li {
   text-decoration:underline;
 }
 
+.lwts-custom-page-vocabulary-2 {
+  
+}
+
+.lwts-custom-page-vocabulary-2 .lwts-custom-page-view-pane-outer .action,
+.lwts-custom-page-vocabulary-2 .lwts-custom-page-view-pane-outer .education{
+  width: 405px;
+  padding:15px;
+}
+.lwts-custom-page-vocabulary-2 .lwts-custom-page-view-pane-outer .action{
+  margin-right:20px;
+}
+
+.action {
+  border-bottom:3px solid #1d7cdc;
+}
+.education {
+  border-bottom:3px solid #2ea165;
+}
+
+.lwts-custom-page-vocabulary-2 .lwts-custom-page-view-pane-outer .action{
+  background:#e7f1fb;
+  border-bottom:3px solid #1d7cdc;
+  border-top:3px solid #1d7cdc;
+}
+.lwts-custom-page-vocabulary-2 .lwts-custom-page-view-pane-outer .education{
+  background:#e9f5ef;
+  border-bottom:3px solid #2ea165;
+  border-top:3px solid #2ea165;
+}
+.action h2,
+.education h2{
+  padding:6px 0;
+}
+.action h2 a,
+.education h2 a{
+  text-decoration:none;
+  font-weight:normal;
+  font-size:0.8em;
+}
+
+.action h2 a{
+  color:#1d7cdc;
+}
+.education h2 a{
+  color:#2ea165;
+}
+
+.page-home-page h1{
+  display:none;
+}
+.page-home-page h3{
+  background:url('../images/wave-icon-grey.png') 0px 2px no-repeat transparent;
+  padding:0 0 0 25px;
+  font-weight:normal;
+  font-size:1.6em;
+}

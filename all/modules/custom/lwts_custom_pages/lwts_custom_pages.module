@@ -328,6 +328,7 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
     'lwts-custom-page-vocabulary-' . $vocab_id . ' clearfix">';
 
   $view_template = views_get_view('get_one_article');
+  $view_display_name = $max_cols == 2 ? 'block_2' : 'block_1';
   $terms = taxonomy_get_tree( $vocab_id, 0, 1 );
   $num_cols = min( count( $terms ), $max_cols );
   $index = 1;
@@ -350,13 +351,13 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
     // Is the given term is a topic.
     if ( $vocab_id == 3 ) {
       // Topics are treated differently - they use depth
-      $output = $view->preview( 'default', array(
+      $output = $view->preview( $view_display_name, array(
         'all', $term->tid, $topic_depth, $exclude
       ) );
     }
     else {
       // The given term is not a topic. It is a "constraint" term.
-      $output = $view->preview( 'default', array(
+      $output = $view->preview( $view_display_name, array(
         $term->tid, 'all', $topic_depth, $exclude
       ) );
     }

@@ -118,6 +118,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $max_rows = 5;
   $action_tid = 2;
   $education_tid = 1;
+  $display_name = 'block_2';
 
   // Irrelevant in the context of this function. Included for readability.
   $topic_depth = 0;
@@ -130,17 +131,17 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     unset( $views );
     $views = array();
     $views[0] = $teaser_view_template->clone_view();
-    $views[0]->display['default']->display_options['pager']['options']['offset'] = $i;
+    $views[0]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
     $views[1] = $teaser_view_template->clone_view();
-    $views[1]->display['default']->display_options['pager']['options']['offset'] = $i;
+    $views[1]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
 
     // "Preview" the views, calculating their results in the process.
     unset( $views_output );
     $views_output = array();
-    $views_output[0] = $views[0]->preview( 'default', array(
+    $views_output[0] = $views[0]->preview( $display_name, array(
       $action_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
-    $views_output[1] = $views[1]->preview( 'default', array(
+    $views_output[1] = $views[1]->preview( $display_name, array(
       $education_tid, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 
@@ -237,7 +238,7 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
     $view = $teaser_view_template->clone_view();
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
-    $view_output = $view->preview( 'default', array(
+    $view_output = $view->preview( 'block_2', array(
       $constraint, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 
@@ -328,10 +329,12 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
     'lwts-custom-page-vocabulary-' . $vocab_id . ' clearfix">';
 
   $view_template = views_get_view('get_one_article');
+  $view_display_name = $max_cols == 2 ? 'block_2' : 'block_1';
   $terms = taxonomy_get_tree( $vocab_id, 0, 1 );
   $num_cols = min( count( $terms ), $max_cols );
   $index = 1;
   $topic_depth = 10;
+  $pane = 1;
 
   foreach( $terms as $term ) {
 
@@ -349,13 +352,13 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
     // Is the given term is a topic.
     if ( $vocab_id == 3 ) {
       // Topics are treated differently - they use depth
-      $output = $view->preview( 'default', array(
+      $output = $view->preview( $view_display_name, array(
         'all', $term->tid, $topic_depth, $exclude
       ) );
     }
     else {
       // The given term is not a topic. It is a "constraint" term.
-      $output = $view->preview( 'default', array(
+      $output = $view->preview( $view_display_name, array(
         $term->tid, 'all', $topic_depth, $exclude
       ) );
     }
@@ -368,7 +371,8 @@ function _lwts_custom_pages_get_top_level_vocab_teasers( $vocab_id, $nodes_to_ex
         _lwts_custom_pages_get_knowledge_type_css_class( $node_id );
 
       $result .= '<div class="lwts-custom-page-view-pane-outer columns-'
-        . $num_cols .'">';
+        . $num_cols .'" id="vocab-' . $vocab_id .'-pane-' . $pane . '">';
+      $pane++;
       $result .= '<h3>' . $term->name . '</h3>';
       $result .= '<div class="lwts-custom-page-view-pane-inner '
         . $knowledge_type . '">';

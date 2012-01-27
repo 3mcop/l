@@ -284,7 +284,7 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
       // Show titles of other articles for the current topic.
       $view = $titles_view_template->clone_view();
       $result .= '<div class="lwts-custom-page-view-pane">';
-      $result .= $view->preview( 'default', array(
+      $result .= $view->preview( 'block_2', array(
         $constraint, $topic->tid, $topic_depth, $top_article_nid
       ) );
       $result .= '</div>'; // view-pane

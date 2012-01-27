@@ -79,13 +79,13 @@ function _lwts_custom_pages_taxonomy_term_page( $term ) {
     else {
       // The given topic has sub-topics.
       // Show summary for each sub-topic.
-      return _lets_custom_pages_sibling_topics_page( $term, NULL );
+      return _lwts_custom_pages_sibling_topics_page( $term, NULL );
     }
 
 //  case 2 : // Knowledge type
   case 4 : // Location
     drupal_set_title( $term->name );
-    return _lets_custom_pages_sibling_topics_page( NULL, $term );
+    return _lwts_custom_pages_sibling_topics_page( NULL, $term );
 
   default:
     // Returns the default term page provided by taxonomy module.
@@ -192,7 +192,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
  *   A constraining term with which all articles must be tagged.
  *   No constraining term is used when this argument is NULL.
  */
-function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint_term = NULL ) {
+function _lwts_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint_term = NULL ) {
 
   // Did calling function supply a base topic?
   if ( empty( $base_topic ) ) {
@@ -228,11 +228,21 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
   $result =
     '<div class="lwts-custom-page lwts-custom-page-' . $label . '">';
 
+  // Get section for current term first
+  $result .= _lwts_custom_pages_get_two_column_topic_summary( $base_topic, $teaser_view_template, $titles_view_template, $featured_nodes, $constraint, 0, FALSE );
 
   foreach ( $topics as $topic ) {
+   $result .= _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_template, $titles_view_template, $featured_nodes, $constraint, $topic_depth );
+  }
+  $result .= '</div>'; // page
+
+  return $result;
+}
+
+function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_template, $titles_view_template, &$featured_nodes, $constraint, $topic_depth, $show_title = TRUE ) {
 
     // Each two-view row starts with a wrapping div.
-    $result .= '<div class="lwts-custom-page-row-outer clearfix">';
+    $result = '<div class="lwts-custom-page-row-outer clearfix">';
 
     // Get the teaser for the featured article for this topic
     $view = $teaser_view_template->clone_view();
@@ -252,7 +262,13 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
       $top_article_nid = $view->result[0]->nid;
       $featured_nodes[] = $top_article_nid;
 
-      $result .= '<h3>' . $topic->name . '</h3>';
+      if ( $show_title ) {
+        $result .= l(
+            '<h3>' . $topic->name . '</h3>',
+            'taxonomy/term/' . $topic->tid,
+            array( 'html' => TRUE )
+            );
+      }
 
       // Inner row div to separate heading from view panes. 
       $result .= '<div class="lwts-custom-page-row-inner clearfix">';
@@ -275,10 +291,7 @@ function _lets_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
     }
 
     $result .= '</div></div>'; // inner and outer rows
-  }
-  $result .= '</div>'; // page
-
-  return $result;
+    return $result;
 }
 
 /**

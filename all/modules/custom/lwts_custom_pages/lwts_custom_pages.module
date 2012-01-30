@@ -131,9 +131,11 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     unset( $views );
     $views = array();
     $views[0] = $teaser_view_template->clone_view();
-    $views[0]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
+//    $views[0]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
+    $views[0]->offset = $i;
     $views[1] = $teaser_view_template->clone_view();
-    $views[1]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
+//    $views[1]->display[$display_name]->display_options['pager']['options']['offset'] = $i;
+    $views[1]->offset = $i;
 
     // "Preview" the views, calculating their results in the process.
     unset( $views_output );

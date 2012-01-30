@@ -230,8 +230,12 @@ function _lwts_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
   $result =
     '<div class="lwts-custom-page lwts-custom-page-' . $label . '">';
 
-  // Get section for current term first
-  $result .= _lwts_custom_pages_get_two_column_topic_summary( $base_topic, $teaser_view_template, $titles_view_template, $featured_nodes, $constraint, 0, FALSE );
+  if ( $base_topic->tid > 0 ) {
+
+    // Get section for current term first
+    $result .= _lwts_custom_pages_get_two_column_topic_summary(
+      $base_topic, $teaser_view_template, $titles_view_template, $featured_nodes, $constraint, 0, FALSE );
+  }
 
   foreach ( $topics as $topic ) {
    $result .= _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_template, $titles_view_template, $featured_nodes, $constraint, $topic_depth );

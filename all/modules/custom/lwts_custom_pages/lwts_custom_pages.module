@@ -282,14 +282,14 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
       // Show teaser wrapped in a div that identifies the Knowledge type.
       $knowledge_type =
         _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
-      $result .=
-        '<div class="lwts-custom-page-view-pane ' . $knowledge_type . '">';
+      $result .= '<div class="lwts-custom-page-view-pane-first lwts-custom-page-view-pane ' . $knowledge_type . '">';
       $result .= $view_output;
       $result .= '</div>'; // view-pane
 
       // Show titles of other articles for the current topic.
       $view = $titles_view_template->clone_view();
-      $result .= '<div class="lwts-custom-page-view-pane">';
+      $result .= '<div class="lwts-custom-page-view-pane-second lwts-custom-page-view-pane">';
+      $result .= '<h4>' . t('Other articles in this topic') . '</h4>';
       $result .= $view->preview( 'block_2', array(
         $constraint, $topic->tid, $topic_depth, $top_article_nid
       ) );

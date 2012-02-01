@@ -111,7 +111,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
 
   $teaser_view_template = views_get_view('get_one_article');
 
-  $result = '<div class="lwts-custom-page lwts-custom-page-' .
+  $result = '<div class="lwts-custom-page lwts-custom-page-leaf-topic lwts-custom-page-' .
     _to_css( $topic->name ) . '">';
 
   // HACK - hard-coded
@@ -228,7 +228,7 @@ function _lwts_custom_pages_sibling_topics_page( $base_topic = NULL, $constraint
   $label = _to_css(
     !empty( $constraint_term ) ? $constraint_term->name : $base_topic->name );
   $result =
-    '<div class="lwts-custom-page lwts-custom-page-' . $label . '">';
+    '<div class="lwts-custom-page lwts-custom-page-branch-topic lwts-custom-page-' . $label . '">';
 
   if ( $base_topic->tid > 0 ) {
 

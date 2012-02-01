@@ -1,0 +1,3 @@
+Issue #1059124 by MGN: Fixes problem with HTML entities in title.
+Issue #1085556 by MGN: Added README.txt file for D7 version.
+

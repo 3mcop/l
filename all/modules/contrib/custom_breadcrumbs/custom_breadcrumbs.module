@@ -1,5 +1,4 @@
 <?php
-// $Id: custom_breadcrumbs.module,v 1.10.2.4 2011/01/09 18:11:58 mgn Exp $
 
 /**
  * @file
@@ -171,6 +170,8 @@ function _custom_breadcrumbs_delete_breadcrumb($bid) {
  *   The desired URI and/or special identifier
  */
 function _custom_breadcrumbs_create_crumb($title, $original_path) {
+  // Decode title to properly handle special characters.
+  $title = decode_entities($title);
   // Collapse double slashes to one.
   $original_path = preg_replace('/\/+/', '/', $original_path);
   // Removing leading and trailing slashes.

@@ -117,13 +117,13 @@ body {
 }
 
 .page-home-page #navigation {
-  height: 100px; 
+  height: 125px; 
 }
 
 .page-home-page .with-navigation #content,
 .page-home-page .with-navigation .region-sidebar-first,
 .page-home-page .with-navigation .region-sidebar-second{
-  margin-top: 100px;
+  margin-top: 125px;
 }
 
 .with-navigation #content,

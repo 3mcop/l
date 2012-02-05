@@ -240,7 +240,8 @@ ul.links li {
 .region-sidebar-second {
 }
 
-.region-sidebar-second h2 {
+.region-sidebar-second h2,
+.lwts-custom-page-view-pane-second h4 {
   background:url('../images/wave-icon-grey.png') 0px 2px no-repeat transparent;
   padding-left: 25px;
   font-weight:normal;
@@ -535,15 +536,28 @@ ul.links li {
 }
 .page-home-page #vocab-2-pane-1 h3{
   background:url('../images/wave-icon-blue2.png') 0px 0px no-repeat transparent;
-color:#1d7cdc;
+  color:#1d7cdc;
+  margin:10px 0 15px 0;
 }
 .page-home-page #vocab-2-pane-2 h3{
   background:url('../images/wave-icon-green.png') 0px 0px no-repeat transparent;
   color:#2ea165;
+  margin:10px 0 15px 0;
 }
 .page-home-page p{
   
 }
+
+.lwts-custom-page .views-field-view-node a{
+  
+}
+.views-field-view-node a{
+  text-decoration:none;
+}
+.views-field-view-node a:hover{
+  text-decoration:underline;
+}
+
 
 #vocab-2-pane-1 .views-field-title a,
 #vocab-2-pane-2 .views-field-title a{
@@ -556,7 +570,7 @@ color:#1d7cdc;
 #search-block-form .form-actions{
  display:none;
 }
-.form-type-textfield input{
+#search-block-form .form-type-textfield input{
  border:1px solid #CFCFCF;
  background:url('../images/glass.png') 98% 50% no-repeat #FFF;
  width:170px;
@@ -614,11 +628,12 @@ color:#1d7cdc;
   float:left;
 }
 .lwts-custom-page .view-get-article-titles .views-field-title,
-.lwts-custom-page .view-get-article-titles .views-field-body{
+.lwts-custom-page .view-get-article-titles .views-field-body,
+.lwts-custom-page .view-get-article-titles .views-field-view-node{
   font-size:0.8em;
   line-height:1.2em;
   float:left;
-  width:180px;
+  width:250px;
   
 }
 .lwts-custom-page .view-get-article-titles .views-field-title{
@@ -651,4 +666,25 @@ color:#1d7cdc;
   border-bottom:1px dotted #545454;
   padding-bottom:25px;
   margin-bottom:15px;
+}
+
+#comments{
+  padding-top:15px;
+  border-top:1px dotted #545454;
+}
+
+#comments h2{
+ padding:1px 3px 3px 3px;
+ padding-left:28px;
+ font-weight:normal;
+ font-size:1.2em;
+ background:url('../images/discuss.png') 0px 2px no-repeat transparent;
+}
+
+#comments .comment{
+  background:#d9ebfe;
+  border:1px solid #ccc;
+  -moz-border-radius: 5px 5px 5px 5px;
+  padding:0 15px;
+  margin:10px 0;
 }

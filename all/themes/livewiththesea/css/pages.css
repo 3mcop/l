@@ -590,11 +590,13 @@ ul.links li {
  width:435px;
  margin-right:100px;
  border-bottom:3px solid #1d7cdc;
+ margin-bottom:15px;
 }
 .lwts-custom-page .education{
  width:435px;
  margin-right:100px;
  border-bottom:3px solid #2ea165;
+ margin-bottom:15px;
 }
 
 .lwts-custom-page .action .view-get-one-article .views-field-title a {

@@ -675,7 +675,7 @@ ul.links li {
 
 #comments h2{
  padding:1px 3px 3px 3px;
- padding-left:28px;
+ padding-left:32px;
  font-weight:normal;
  font-size:1.2em;
  background:url('../images/discuss.png') 0px 2px no-repeat transparent;
@@ -687,4 +687,8 @@ ul.links li {
   -moz-border-radius: 5px 5px 5px 5px;
   padding:0 15px;
   margin:10px 0;
+}
+.filter-wrapper {
+    border: none;
+    
 }

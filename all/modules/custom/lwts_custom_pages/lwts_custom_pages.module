@@ -118,7 +118,7 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
   $max_rows = 5;
   $action_tid = 2;
   $education_tid = 1;
-  $display_name = 'block_2';
+  $display_name = 'block_4';
 
   // Irrelevant in the context of this function. Included for readability.
   $topic_depth = 0;
@@ -254,7 +254,7 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
     $view = $teaser_view_template->clone_view();
     $nids_to_exclude =
       empty( $featured_nodes ) ? NULL : implode( $featured_nodes, '+' );
-    $view_output = $view->preview( 'block_2', array(
+    $view_output = $view->preview( 'block_3', array(
       $constraint, $topic->tid, $topic_depth, $nids_to_exclude
     ) );
 

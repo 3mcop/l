@@ -16,6 +16,10 @@ function lwts_misc_node_view_alter( &$build ) {
 
     // Set the weight of the AddThis widget to match design.
     $build['addthis']['#weight'] = 10;
+
+    // Add a div around the AddThis markup, for easier theming.
+    $build['addthis']['#markup'] = '<div class="addthis-node-decoration">'
+      . $build['addthis']['#markup'] . '</div>';
   }
 }
 

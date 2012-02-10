@@ -154,7 +154,8 @@ function _lwts_custom_pages_leaf_topic_page( $topic ) {
     }
 
     // Each two-view row starts with a wrapping div.
-    $result .= '<div class="lwts-custom-page-row-outer clearfix">';
+    $result .=
+      '<div class="lwts-custom-page-row-outer clearfix row-' . $i . '">';
 
     // Iterate over the two previewed views.
     for ( $j = 0; $j < 2;  $j++ ) {

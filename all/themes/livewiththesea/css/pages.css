@@ -599,6 +599,29 @@ ul.links li {
  margin-bottom:15px;
 }
 
+.content .lwts-custom-page-leaf-topic .action{
+ width:435px;
+ margin-right:20px;
+ border-bottom:3px solid #1d7cdc;
+ margin-bottom:15px;
+ float:left;
+}
+.content .lwts-custom-page-leaf-topic .education{
+ width:435px;
+ border-bottom:3px solid #2ea165;
+ margin-bottom:15px;
+ float:left;
+ 
+  margin-right:0px;
+}
+
+.lwts-custom-page-leaf-topic .lwts-custom-page-row-outer .empty{
+ width:435px;
+ margin-bottom:15px;
+ float:left;
+ margin-left:20px;
+}
+
 .lwts-custom-page .action .view-get-one-article .views-field-title a {
     color: #1D7CDC;
 }
@@ -693,4 +716,8 @@ ul.links li {
 .filter-wrapper {
     border: none;
     
+}
+
+.center_flag{
+ margin: 0 28px;    
 }

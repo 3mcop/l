@@ -558,7 +558,8 @@ ul.links li {
   text-decoration:underline;
 }
 
-
+#page-wrapper .content .lwts-leaf-topic-row-0 .action .views-field-title a,
+#page-wrapper .content .lwts-leaf-topic-row-0 .education .views-field-title a,
 #vocab-2-pane-1 .views-field-title a,
 #vocab-2-pane-2 .views-field-title a{
    color:#545454;
@@ -621,6 +622,24 @@ ul.links li {
  float:left;
  margin-left:20px;
 }
+
+.content .lwts-leaf-topic-row-0 .action{
+ background: none repeat scroll 0 0 #E7F1FB;
+    border-bottom: 3px solid #1D7CDC;
+    border-top: 3px solid #1D7CDC;
+    margin-right: 20px;
+    padding: 15px;
+    width: 405px;
+}
+.content .lwts-leaf-topic-row-0 .education{
+background: none repeat scroll 0 0 #E9F5EF;
+    border-bottom: 3px solid #2EA165;
+    border-top: 3px solid #2EA165;
+    margin-right: 0;
+    padding: 15px;
+    width: 405px;
+}
+
 
 .lwts-custom-page .action .view-get-one-article .views-field-title a {
     color: #1D7CDC;

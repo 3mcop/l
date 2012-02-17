@@ -269,6 +269,10 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
       $top_article_nid = $view->result[0]->nid;
       $featured_nodes[] = $top_article_nid;
 
+      // Inner row div - inner/outer row no longer needed. Kept anyway in
+      // case removal might affect existing CSS rules.
+      $result .= '<div class="lwts-custom-page-row-inner clearfix">';
+
       if ( $show_title ) {
         $result .= l(
             '<h3>' . $topic->name . '</h3>',
@@ -276,9 +280,6 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
             array( 'html' => TRUE )
             );
       }
-
-      // Inner row div to separate heading from view panes. 
-      $result .= '<div class="lwts-custom-page-row-inner clearfix">';
 
       // Show teaser wrapped in a div that identifies the Knowledge type.
       $knowledge_type =

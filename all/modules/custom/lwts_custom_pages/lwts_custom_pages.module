@@ -273,6 +273,11 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
       // case removal might affect existing CSS rules.
       $result .= '<div class="lwts-custom-page-row-inner clearfix">';
 
+      // Show teaser wrapped in a div that identifies the Knowledge type.
+      $knowledge_type =
+        _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
+      $result .= '<div class="lwts-custom-page-view-pane-first lwts-custom-page-view-pane ' . $knowledge_type . '">';
+
       if ( $show_title ) {
         $result .= l(
             '<h3>' . $topic->name . '</h3>',
@@ -281,10 +286,6 @@ function _lwts_custom_pages_get_two_column_topic_summary( $topic, $teaser_view_t
             );
       }
 
-      // Show teaser wrapped in a div that identifies the Knowledge type.
-      $knowledge_type =
-        _lwts_custom_pages_get_knowledge_type_css_class( $top_article_nid );
-      $result .= '<div class="lwts-custom-page-view-pane-first lwts-custom-page-view-pane ' . $knowledge_type . '">';
       $result .= $view_output;
       $result .= '</div>'; // view-pane
 
